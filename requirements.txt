@@ -1,0 +1,13 @@
+# Jogo de Damas - Requirements
+# Este arquivo lista as dependências do projeto
+
+# Tkinter: Geralmente incluído com Python
+# Caso não esteja instalado, use um dos comandos abaixo:
+# Ubuntu/Debian: sudo apt-get install python3-tk
+# Fedora: sudo dnf install python3-tkinter
+# macOS (com brew): brew install python-tk
+# Windows: Norm instalado com Python
+
+# Python 3.7+ necessário
+#
+# Nenhuma dependência externa requerida além do tkinter que vem com Python
