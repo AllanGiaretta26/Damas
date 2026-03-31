@@ -217,11 +217,9 @@ Este projeto é fornecido como está para fins educacionais.
 
 ## 👨‍💻 Autor
 
+Allan Giaretta.
+
 Desenvolvido como um exemplo completo de aplicação Python com interface gráfica.
-
-## 📞 Suporte
-
-Para dúvidas ou sugestões sobre o jogo, consulte os comentários no código-fonte, que explicam detalhadamente cada funcionalidade.
 
 ---
 
