@@ -216,10 +216,7 @@ gui.janela.after(500, ...)  # Aumentar 500 para delay maior
 Este projeto é fornecido como está para fins educacionais.
 
 ## 👨‍💻 Autor
-
-Allan Giaretta.
-
-Desenvolvido como um exemplo completo de aplicação Python com interface gráfica.
+Desenvolvido por Allan Giaretta.
 
 ---
 
