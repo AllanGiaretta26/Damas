@@ -45,5 +45,8 @@ echo ""
 echo "Iniciando jogo..."
 echo ""
 
+# Navegar para o diretório raiz do projeto
+cd "$(dirname "$0")/.."
+
 # Executar o jogo
 $PYTHON main.py

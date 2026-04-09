@@ -15,12 +15,15 @@ Este programa implementa um jogo de damas completo com as seguintes característ
 - IA simples (opcional) para jogar contra o computador
 - Histórico de jogadas
 - Reinício de partida
+
+Refatorado com princípios SOLID e Clean Code.
 """
 
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 from src.gui import GUIJogo
-from src.game import Jogo, Jogador
+from src.game import Jogo
+from src.models import Jogador
 from src.ia import IA
 
 
@@ -28,36 +31,43 @@ class AplicacaoDamas:
     """
     Classe principal da aplicação que gerencia a seleção de modo de jogo
     e a inicialização da interface gráfica.
-    """
     
+    Responsabilidades:
+    - Exibir tela inicial de seleção de modo
+    - Iniciar jogo no modo selecionado
+    - Configurar IA quando necessário
+    
+    Segue SRP: apenas gerencia fluxo inicial da aplicação.
+    """
+
     def __init__(self):
         """Inicializa a aplicação."""
         self.janela = tk.Tk()
         self.modo_jogo = None
         self.ia = None
         self._criar_tela_inicial()
-    
-    def _criar_tela_inicial(self):
+
+    def _criar_tela_inicial(self) -> None:
         """Cria a tela inicial de seleção de modo."""
         self.janela.title("Jogo de Damas")
         self.janela.geometry("400x300")
         self.janela.resizable(False, False)
-        
+
         # Frame principal
         frame_principal = tk.Frame(self.janela, bg="#CCCCCC")
         frame_principal.pack(fill=tk.BOTH, expand=True)
-        
+
         # Título
         titulo = tk.Label(frame_principal, text="Bem-vindo ao Jogo de Damas!",
                          font=("Arial", 18, "bold"), bg="#CCCCCC")
         titulo.pack(pady=20)
-        
+
         # Subtítulo
         subtitulo = tk.Label(frame_principal,
                             text="Escolha o modo de jogo:",
                             font=("Arial", 12), bg="#CCCCCC")
         subtitulo.pack(pady=10)
-        
+
         # Botão para jogar contra humano
         btn_humano = tk.Button(
             frame_principal,
@@ -69,7 +79,7 @@ class AplicacaoDamas:
             command=lambda: self._iniciar_jogo("humano")
         )
         btn_humano.pack(pady=10)
-        
+
         # Botão para jogar contra IA
         btn_ia = tk.Button(
             frame_principal,
@@ -81,7 +91,7 @@ class AplicacaoDamas:
             command=lambda: self._iniciar_jogo("ia")
         )
         btn_ia.pack(pady=10)
-        
+
         # Botão para sair
         btn_sair = tk.Button(
             frame_principal,
@@ -92,7 +102,7 @@ class AplicacaoDamas:
             command=self.janela.quit
         )
         btn_sair.pack(pady=10)
-        
+
         # Informações
         info = tk.Label(
             frame_principal,
@@ -101,53 +111,60 @@ class AplicacaoDamas:
             bg="#CCCCCC"
         )
         info.pack(pady=20)
-    
-    def _iniciar_jogo(self, modo: str):
-        """Inicia o jogo no modo especificado."""
+
+    def _iniciar_jogo(self, modo: str) -> None:
+        """
+        Inicia o jogo no modo especificado.
+        
+        Args:
+            modo: Modo de jogo ("humano" ou "ia")
+        """
         self.modo_jogo = modo
         self.janela.destroy()
-        
+
         # Criar nova janela para o jogo
         janela_jogo = tk.Tk()
         gui = GUIJogo(janela_jogo)
-        
+
         if modo == "ia":
             self.ia = IA(gui.jogo)
-            # Configurar callback para movimento da IA
             self._configurar_ia(gui)
-        
+
         gui.iniciar()
-    
-    def _configurar_ia(self, gui: GUIJogo):
-        """Configura os callbacks para a IA jogar automaticamente."""
-        def ao_atualizar_tela():
+
+    def _configurar_ia(self, gui: GUIJogo) -> None:
+        """
+        Configura os callbacks para a IA jogar automaticamente.
+        
+        Args:
+            gui: Instância da GUI do jogo
+        """
+        def callback_ia():
             """Chamado após cada atualização da tela."""
             if gui.jogo.jogador_atual == Jogador.JOGADOR2:
-                # Programar movimento da IA
-                gui.janela.after(500, lambda: executar_ia(gui))
+                # Agendar movimento da IA após 500ms
+                gui.janela.after(500, lambda: self._executar_ia(gui))
+
+        # Configurar callback no gerenciador de interface
+        gui._gerenciador.callback_pos_atualizacao = callback_ia
+
+    def _executar_ia(self, gui: GUIJogo) -> None:
+        """
+        Executa o movimento da IA.
         
-        # Salvar método original
-        gui._atualizar_tela_original = gui._atualizar_tela
-        
-        def nova_atualizar_tela():
-            """Sobrepõe o método de atualizar tela."""
-            gui._atualizar_tela_original()
-            ao_atualizar_tela()
-        
-        # Substituir método
-        gui._atualizar_tela = nova_atualizar_tela
-    
-    def executar(self):
+        Args:
+            gui: Instância da GUI do jogo
+        """
+        # Verificar novamente se ainda é turno da IA
+        if gui.jogo.jogador_atual == Jogador.JOGADOR2:
+            ia = IA(gui.jogo)
+            ia.fazer_movimento()
+            # Atualizar tela após movimento da IA
+            gui._atualizar_tela()
+
+    def executar(self) -> None:
         """Executa a aplicação."""
         self.janela.mainloop()
-
-
-def executar_ia(gui: GUIJogo):
-    """Executa um movimento da IA."""
-    if gui.jogo.jogador_atual == Jogador.JOGADOR2:
-        ia = IA(gui.jogo)
-        ia.fazer_movimento()
-        gui._atualizar_tela()
 
 
 if __name__ == "__main__":
@@ -169,6 +186,6 @@ if __name__ == "__main__":
     print("- Verde = movimento simples")
     print("- Laranja = captura")
     print("=" * 60 + "\n")
-    
+
     app = AplicacaoDamas()
     app.executar()

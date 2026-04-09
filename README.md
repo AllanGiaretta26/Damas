@@ -2,6 +2,8 @@
 
 Um jogo de damas completo com interface gráfica em **tkinter**, implementado em Python com regras tradicionais e IA simples.
 
+**Refatorado com princípios SOLID e Clean Code.**
+
 ## 📋 Características Principais
 
 ### Funcionalidades Essenciais
@@ -56,17 +58,59 @@ cd IA-VScode
 
 # Execute o jogo
 python main.py
+
+# Ou use o script pronto
+scripts/executar_jogo.bat  # Windows
+scripts/executar_jogo.sh   # Linux/Mac
+```
+
+### Executar Testes
+```bash
+python tests/teste_jogo.py
 ```
 
 ### Estrutura de Pastas
 ```
 IA-VScode/
-├── main.py           # Ponto de entrada da aplicação
-├── README.md         # Este arquivo
-└── src/
-    ├── game.py       # Lógica principal do jogo
-    ├── gui.py        # Interface gráfica
-    └── ia.py         # IA do computador
+├── main.py                 # Ponto de entrada da aplicação
+├── README.md               # Este arquivo
+├── requirements.txt        # Dependências
+├── .gitignore             # Arquivos ignorados pelo git
+│
+├── src/                   # Código fonte
+│   ├── models/            # Classes de domínio (SRP)
+│   │   ├── enums.py       # Enumerações
+│   │   ├── peca.py        # Classe Peca
+│   │   └── tabuleiro.py   # Classe Tabuleiro
+│   ├── services/          # Serviços especializados (SRP)
+│   │   ├── movimento_validator.py  # Validação de movimentos
+│   │   ├── capture_handler.py      # Gerenciamento de capturas
+│   │   └── promotion_handler.py    # Promoção de peças
+│   ├── ia/                # Inteligência Artificial (Strategy Pattern)
+│   │   ├── estrategias.py # Estratégias por dificuldade
+│   │   └── __init__.py    # Classe IA com factory
+│   ├── gui/               # Interface Gráfica (SRP)
+│   │   ├── renderizador.py          # Renderização
+│   │   └── gerenciador_interface.py # Gerenciamento de UI
+│   ├── game.py            # Classe Jogo (orquestradora)
+│   └── config.py          # Configurações
+│
+├── tests/                 # Testes
+│   ├── __init__.py
+│   └── teste_jogo.py      # Testes unitários
+│
+├── scripts/               # Scripts utilitários
+│   ├── executar_jogo.bat  # Script Windows
+│   ├── executar_jogo.sh   # Script Linux
+│   └── exemplos_avancados.py
+│
+└── docs/                  # Documentação
+    ├── INDEX.md           # Índice de documentação
+    ├── guides/
+    │   └── comece-aqui.md
+    ├── refatoracao.md
+    ├── refatoracao-solid-clean-code.md
+    └── ...
 ```
 
 ## 🎮 Como Jogar

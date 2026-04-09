@@ -1,30 +1,70 @@
-# Ambientes virtuais
+# ============================================
+# Python - Ambientes virtuais
+# ============================================
 .venv/
 venv/
 env/
 
-# Cache e bytecode do Python
+# ============================================
+# Python - Cache e bytecode
+# ============================================
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
-# Ferramentas e testes
+# ============================================
+# Python - Distribuição / embalagem
+# ============================================
+build/
+dist/
+*.egg-info/
+*.egg
+.installed.cfg
+
+# ============================================
+# Python - Testes e cobertura
+# ============================================
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 .coverage.*
 htmlcov/
+*.xml  # pytest reports
 
+# ============================================
 # Logs
+# ============================================
 *.log
+logs/
 
+# ============================================
 # Arquivos de ambiente local
+# ============================================
 .env
 .env.*
+.env.local
+database.properties
 
+# ============================================
 # IDEs e sistema operacional
+# ============================================
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 Thumbs.db
 .DS_Store
+
+# ============================================
+# Qwen Code - Arquivos temporários
+# ============================================
+.qwen
+
+# ============================================
+# Banco de dados (se aplicável no futuro)
+# ============================================
+*.db
+*.sqlite3

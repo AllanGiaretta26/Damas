@@ -41,6 +41,9 @@ echo.
 echo Iniciando jogo...
 echo.
 
+REM Navegar para o diretório raiz do projeto
+cd /d "%~dp0.."
+
 python main.py
 
 pause
