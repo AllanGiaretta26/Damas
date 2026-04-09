@@ -2,8 +2,6 @@
 
 Um jogo de damas completo com interface gráfica em **tkinter**, implementado em Python com regras tradicionais e IA simples.
 
-**Refatorado com princípios SOLID e Clean Code.**
-
 ## 📋 Características Principais
 
 ### Funcionalidades Essenciais
@@ -246,22 +244,9 @@ Ajuste o tempo em `main.py` na linha:
 gui.janela.after(500, ...)  # Aumentar 500 para delay maior
 ```
 
-## 📚 Melhorias Futuras
-
-- [ ] Salvar/carregar partidas
-- [ ] Diferentes níveis de dificuldade da IA
-- [ ] Modo de treino com dicas
-- [ ] Sons e efeitos
-- [ ] Estatísticas de jogador
-- [ ] Servidor multiplayer
-
 ## 📄 Licença
 
 Este projeto é fornecido como está para fins educacionais.
 
 ## 👨‍💻 Autor
 Desenvolvido por Allan Giaretta.
-
----
-
-**Bom jogo! 🎉**
