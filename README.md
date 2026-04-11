@@ -244,9 +244,5 @@ Ajuste o tempo em `main.py` na linha:
 gui.janela.after(500, ...)  # Aumentar 500 para delay maior
 ```
 
-## 📄 Licença
-
-Este projeto é fornecido como está para fins educacionais.
-
 ## 👨‍💻 Autor
 Desenvolvido por Allan Giaretta.
