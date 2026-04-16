@@ -192,4 +192,4 @@ Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais
 
 ---
 
-Desenvolvido por Allan Giaretta.
+Desenvolvido por **Allan Giaretta**.
