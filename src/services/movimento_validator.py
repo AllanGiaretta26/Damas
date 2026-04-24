@@ -53,7 +53,7 @@ class MovimentoValidator:
 
         # Se o jogador tem capturas disponíveis, só permite capturas
         capturas = self.encontrar_capturas(linha, coluna)
-        if self._jogador_tem_capturas(jogador_atual):
+        if self.jogador_tem_capturas(jogador_atual):
             return capturas
 
         # Movimento simples
@@ -140,7 +140,7 @@ class MovimentoValidator:
 
         return capturas
 
-    def _jogador_tem_capturas(self, jogador: Jogador) -> bool:
+    def jogador_tem_capturas(self, jogador: Jogador) -> bool:
         """Verifica se o jogador possui alguma captura obrigatória."""
         for linha in range(Tabuleiro.TAMANHO):
             for coluna in range(Tabuleiro.TAMANHO):

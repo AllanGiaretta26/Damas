@@ -29,6 +29,10 @@ class Peca:
         """Promove uma peça comum para dama."""
         self.tipo = TipoPeca.DAMA
 
+    def despromover(self) -> None:
+        """Reverte uma dama para peça comum (usado por desfazer_jogada)."""
+        self.tipo = TipoPeca.PECA
+
     def atualizar_posicao(self, nova_linha: int, nova_coluna: int) -> None:
         """Move a peça para uma nova posição."""
         self.linha = nova_linha

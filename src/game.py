@@ -75,22 +75,22 @@ class Jogo:
         self._em_sequencia_captura = valor
 
     @property
-    def piezas_capturadas_j1(self) -> int:
+    def pecas_capturadas_j1(self) -> int:
         """Retorna peças capturadas pelo jogador 1."""
         return self._pecas_capturadas_jogador1
 
-    @piezas_capturadas_j1.setter
-    def piezas_capturadas_j1(self, valor: int) -> None:
+    @pecas_capturadas_j1.setter
+    def pecas_capturadas_j1(self, valor: int) -> None:
         """Define peças capturadas pelo jogador 1."""
         self._pecas_capturadas_jogador1 = valor
 
     @property
-    def piezas_capturadas_j2(self) -> int:
+    def pecas_capturadas_j2(self) -> int:
         """Retorna peças capturadas pelo jogador 2."""
         return self._pecas_capturadas_jogador2
 
-    @piezas_capturadas_j2.setter
-    def piezas_capturadas_j2(self, valor: int) -> None:
+    @pecas_capturadas_j2.setter
+    def pecas_capturadas_j2(self, valor: int) -> None:
         """Define peças capturadas pelo jogador 2."""
         self._pecas_capturadas_jogador2 = valor
 
@@ -150,18 +150,30 @@ class Jogo:
         if (linha_destino, coluna_destino) not in movimentos_validos:
             return False
 
+        # Snapshot do estado antes da jogada (para desfazer_jogada)
+        em_sequencia_antes = self._em_sequencia_captura
+        jogador_antes = self.jogador_atual
+        peca_selecionada_antes = self._peca_selecionada
+
         self._peca_selecionada = peca
         self._movimentos_validos = movimentos_validos
 
         # Verificar se é captura
         diff_linha = abs(linha_destino - linha_origem)
         eh_captura = diff_linha == 2
-        
+
+        peca_capturada = None
+        pos_capturada = None
+
         if eh_captura:
+            pos_capturada = (
+                (linha_origem + linha_destino) // 2,
+                (coluna_origem + coluna_destino) // 2,
+            )
             peca_capturada = self._capture_handler.executar_captura(
                 linha_origem, coluna_origem, linha_destino, coluna_destino
             )
-            
+
             if peca_capturada:
                 self._registrar_captura(peca_capturada)
         else:
@@ -172,11 +184,19 @@ class Jogo:
                 return False
 
         # Tentar promoção
-        self._promotion_handler.tentar_promover(peca)
-        
-        # Registrar jogada
-        self._registrar_jogada(linha_origem, coluna_origem, 
-                              linha_destino, coluna_destino)
+        promoveu = self._promotion_handler.tentar_promover(peca)
+
+        # Registrar jogada com delta reversível
+        self._registrar_jogada(
+            linha_origem, coluna_origem,
+            linha_destino, coluna_destino,
+            peca_capturada=peca_capturada,
+            pos_capturada=pos_capturada,
+            promoveu=promoveu,
+            em_sequencia_antes=em_sequencia_antes,
+            jogador_antes=jogador_antes,
+            peca_selecionada_antes=peca_selecionada_antes,
+        )
 
         # Verificar capturas sequenciais
         if eh_captura:
@@ -200,13 +220,72 @@ class Jogo:
             self._pecas_capturadas_jogador1 += 1
 
     def _registrar_jogada(self, linha_origem: int, coluna_origem: int,
-                         linha_destino: int, coluna_destino: int) -> None:
-        """Registra uma jogada no histórico."""
+                          linha_destino: int, coluna_destino: int,
+                          peca_capturada: Optional[Peca] = None,
+                          pos_capturada: Optional[Tuple[int, int]] = None,
+                          promoveu: bool = False,
+                          em_sequencia_antes: bool = False,
+                          jogador_antes: Optional[Jogador] = None,
+                          peca_selecionada_antes: Optional[Peca] = None) -> None:
+        """Registra uma jogada no histórico com delta reversível."""
         self.historico_jogadas.append({
-            'jogador': self.jogador_atual,
+            'jogador': jogador_antes if jogador_antes is not None else self.jogador_atual,
             'de': (linha_origem, coluna_origem),
-            'para': (linha_destino, coluna_destino)
+            'para': (linha_destino, coluna_destino),
+            'peca_capturada': peca_capturada,
+            'pos_capturada': pos_capturada,
+            'promoveu': promoveu,
+            'em_sequencia_antes': em_sequencia_antes,
+            'jogador_antes': jogador_antes,
+            'peca_selecionada_antes': peca_selecionada_antes,
         })
+
+    def desfazer_jogada(self) -> bool:
+        """
+        Desfaz a última jogada, revertendo tabuleiro, turno, captura e promoção.
+
+        Returns:
+            True se desfez, False se histórico vazio.
+        """
+        if not self.historico_jogadas:
+            return False
+
+        delta = self.historico_jogadas.pop()
+        linha_origem, coluna_origem = delta['de']
+        linha_destino, coluna_destino = delta['para']
+
+        peca = self.tabuleiro.obter_peca(linha_destino, coluna_destino)
+        if peca is None:
+            # Estado inconsistente — recolocar delta e sair
+            self.historico_jogadas.append(delta)
+            return False
+
+        # Reverter promoção antes de recolocar — ordem indiferente, mas mantém clareza
+        if delta.get('promoveu'):
+            peca.despromover()
+
+        # Mover peça de volta à origem
+        self.tabuleiro.mover_peca(
+            linha_destino, coluna_destino, linha_origem, coluna_origem
+        )
+
+        # Recolocar peça capturada
+        peca_capturada = delta.get('peca_capturada')
+        if peca_capturada is not None:
+            linha_cap, coluna_cap = delta['pos_capturada']
+            self.tabuleiro.colocar_peca(peca_capturada, linha_cap, coluna_cap)
+            if peca_capturada.pertence_ao_jogador(Jogador.JOGADOR1):
+                self._pecas_capturadas_jogador2 -= 1
+            else:
+                self._pecas_capturadas_jogador1 -= 1
+
+        # Restaurar estado de seleção e turno
+        self._em_sequencia_captura = delta.get('em_sequencia_antes', False)
+        self._peca_selecionada = delta.get('peca_selecionada_antes')
+        self.jogador_atual = delta.get('jogador_antes', self.jogador_atual)
+        self._movimentos_validos = []
+
+        return True
 
     def _encerrar_turno(self) -> None:
         """Limpa o estado temporário do turno e passa a vez."""
@@ -266,7 +345,7 @@ class Jogo:
 
     def jogador_tem_capturas(self, jogador: Jogador) -> bool:
         """Verifica se um jogador tem capturas disponíveis (usado pela IA)."""
-        return self._movimento_validator._jogador_tem_capturas(jogador)
+        return self._movimento_validator.jogador_tem_capturas(jogador)
 
     def encontrar_capturas_para_peca(self, linha: int, coluna: int) -> List[Tuple[int, int]]:
         """Encontra capturas para uma peça (usado pela IA)."""
