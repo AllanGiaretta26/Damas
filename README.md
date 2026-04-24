@@ -1,17 +1,17 @@
 # Jogo de Damas em Python
 
-![Status](https://img.shields.io/badge/status-concluído-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue)
 ![Tkinter](https://img.shields.io/badge/GUI-tkinter-informational)
+![Status](https://img.shields.io/badge/status-concluído-brightgreen)
 ![Licença](https://img.shields.io/badge/licença-MIT-lightgrey)
 
-> Jogo de damas completo com interface gráfica em tkinter, modo contra IA e arquitetura baseada em princípios SOLID e Clean Code.
+> Jogo de damas completo com interface gráfica em tkinter, IA baseada em minimax com poda alfa-beta e arquitetura orientada a princípios SOLID.
 
 ---
 
 ## Descrição
 
-Implementação do jogo de damas com todas as regras tradicionais, incluindo capturas obrigatórias, múltiplas capturas em sequência e promoção de peças a dama. O projeto oferece dois modos: duelo entre dois jogadores humanos ou partida contra uma IA baseada em heurísticas de priorização.
+Implementação do jogo de damas com todas as regras tradicionais: capturas obrigatórias, múltiplas capturas em sequência, promoção de peças a dama e desfazer jogada. O projeto oferece dois modos — duelo humano vs. humano ou partida contra uma IA com três níveis de dificuldade, incluindo minimax com poda alfa-beta nos níveis Médio e Difícil.
 
 A arquitetura segue princípios SOLID com separação clara de responsabilidades entre modelos, serviços, IA e interface gráfica.
 
@@ -21,7 +21,7 @@ A arquitetura segue princípios SOLID com separação clara de responsabilidades
 
 ![Status](https://img.shields.io/badge/status-concluído-brightgreen)
 
-Projeto concluído e funcional. Melhorias futuras listadas ao final deste documento.
+Projeto concluído e funcional.
 
 ---
 
@@ -40,8 +40,8 @@ Projeto concluído e funcional. Melhorias futuras listadas ao final deste docume
 
 ### Pré-requisitos
 
-- Python 3.7 ou superior instalado
-- tkinter (já incluso no Python na maioria dos sistemas)
+- Python 3.7 ou superior
+- tkinter (já incluso na maioria das instalações do Python)
 
 ### Instalação
 
@@ -75,17 +75,29 @@ python tests/teste_jogo.py
 ## Como Jogar
 
 1. Execute `python main.py`
-2. Escolha o modo: **Dois Jogadores** ou **Contra a IA**
+2. Escolha o modo de jogo:
+   - **Dois Jogadores** — humano vs. humano
+   - **Contra a IA** — escolha a dificuldade (Fácil / Médio / Difícil) e sua cor (Vermelho ou Azul)
 3. Clique em uma de suas peças para selecioná-la
 4. Clique em uma casa destacada para mover:
    - Verde = movimento simples
    - Laranja = captura
 5. Capturas são obrigatórias quando disponíveis
+6. Use o botão **Desfazer** para reverter a última jogada — no modo IA, desfaz também a resposta da IA
 
-**Cores:**
-- Vermelho = Jogador 1
-- Azul = Jogador 2 (ou IA)
-- Coroa = peça promovida a dama
+**Cores:** Vermelho = Jogador 1 | Azul = Jogador 2 / IA | Coroa = dama promovida
+
+---
+
+## IA — Níveis de Dificuldade
+
+| Nível | Estratégia | Tempo médio por jogada |
+|---|---|---|
+| Fácil | Movimentos aleatórios | < 1 ms |
+| Médio | Minimax com poda alfa-beta (profundidade 3) | ~50–200 ms |
+| Difícil | Minimax com poda alfa-beta (profundidade 5) | ~0.1–3 s |
+
+A função de avaliação é baseada em material: peça comum vale 1 ponto, dama vale 3. Movimentos de captura são explorados primeiro para melhorar a eficiência da poda.
 
 ---
 
@@ -93,45 +105,20 @@ python tests/teste_jogo.py
 
 ```
 Damas/
-├── main.py                          # Ponto de entrada
-├── requirements.txt
-│
+├── main.py                          # Ponto de entrada e menu inicial
 ├── src/
-│   ├── config.py                    # Configurações globais
-│   ├── game.py                      # Orquestração do jogo
-│   ├── models/
-│   │   ├── enums.py                 # Enumerações
-│   │   ├── peca.py                  # Modelo de peça
-│   │   └── tabuleiro.py             # Estado do tabuleiro
-│   ├── services/
-│   │   ├── movimento_validator.py   # Validação de movimentos
-│   │   ├── capture_handler.py       # Lógica de capturas
-│   │   └── promotion_handler.py     # Promoção de peças
-│   ├── ia/
-│   │   ├── estrategias.py           # Estratégias por heurística
-│   │   └── __init__.py              # Factory da IA
-│   └── gui/
-│       ├── renderizador.py          # Renderização do tabuleiro
-│       └── gerenciador_interface.py # Gerenciamento da UI
-│
+│   ├── config.py                    # Configurações globais (cores, tamanhos)
+│   ├── game.py                      # Orquestrador do jogo (Jogo)
+│   ├── models/                      # Estado puro: Tabuleiro, Peca, enums
+│   ├── services/                    # Regras: validação, capturas, promoção
+│   ├── ia/                          # IA: factory + estratégias minimax
+│   └── gui/                         # Interface tkinter: renderização e eventos
 ├── tests/
 │   └── teste_jogo.py
-│
 └── scripts/
     ├── executar_jogo.bat
     └── executar_jogo.sh
 ```
-
----
-
-## Estratégia da IA
-
-A IA avalia e prioriza jogadas na seguinte ordem:
-
-1. Capturas múltiplas em sequência
-2. Promoção a dama
-3. Movimentos seguros (evita exposição)
-4. Movimento aleatório como fallback
 
 ---
 
@@ -144,6 +131,8 @@ jogo = Jogo()
 jogo.selecionar_peca(2, 1)
 print(jogo.movimentos_validos)
 jogo.mover_peca(2, 1, 3, 0)
+
+jogo.desfazer_jogada()
 
 fim, vencedor = jogo.verificar_fim_de_jogo()
 if fim:
@@ -167,23 +156,6 @@ sudo dnf install python3-tkinter
 brew install python-tk
 ```
 
-**IA jogando rápido demais**
-
-Aumente o delay em `main.py`:
-```python
-gui.janela.after(1000, ...)  # valor em milissegundos
-```
-
----
-
-## Melhorias Futuras
-
-- [ ] Diferentes níveis de dificuldade da IA
-- [ ] Salvar e carregar partidas
-- [ ] Modo de treino com dicas visuais
-- [ ] Estatísticas e histórico de partidas
-- [ ] Efeitos sonoros
-
 ---
 
 ## Licença
@@ -192,4 +164,4 @@ Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais
 
 ---
 
-Desenvolvido por **Allan Giaretta**.
+Desenvolvido por [Allan Giaretta](https://github.com/AllanGiaretta26).
