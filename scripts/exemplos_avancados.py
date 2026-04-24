@@ -33,7 +33,7 @@ def exemplo_1_jogo_automatizado():
         fim_jogo, vencedor = jogo.verificar_fim_de_jogo()
         if fim_jogo:
             nome = "IA 1" if vencedor == Jogador.JOGADOR1 else "IA 2"
-            print(f"\n✅ Jogo terminado! {nome} venceu!")
+            print(f"\n[OK] Jogo terminado! {nome} venceu!")
             print(f"   Total de movimentos: {movimento_num}")
             break
         
@@ -42,7 +42,7 @@ def exemplo_1_jogo_automatizado():
         sucesso = ia_atual.fazer_movimento()
         
         if not sucesso:
-            print("\n❌ Erro ao fazer movimento")
+            print("\n[FAIL] Erro ao fazer movimento")
             break
         
         movimento_num += 1
@@ -152,9 +152,9 @@ def exemplo_4_replay_historico():
         if jogo.selecionar_peca(origem_linha, origem_coluna):
             if jogo.mover_peca(origem_linha, origem_coluna, 
                                dest_linha, dest_coluna):
-                print(f"✅ Movimento OK: ({origem_linha},{origem_coluna}) → ({dest_linha},{dest_coluna})")
+                print(f"[OK] Movimento OK: ({origem_linha},{origem_coluna}) → ({dest_linha},{dest_coluna})")
             else:
-                print(f"❌ Movimento falhou")
+                print(f"[FAIL] Movimento falhou")
         else:
             break
     
@@ -184,7 +184,7 @@ def exemplo_5_testar_regras():
     peca = jogo.tabuleiro.obter_peca(2, 1)
     movimentos = jogo._calcular_movimentos_validos(2, 1)
     todos_para_frente = all(m[0] > 2 for m in movimentos)
-    print(f"   ✅ Validado" if todos_para_frente else "   ❌ Falhou")
+    print(f"   [OK] Validado" if todos_para_frente else "   [FAIL] Falhou")
     
     # Teste 2: Movimentos devem ser apenas nas diagonais
     print("\n2. Teste: Movimentos apenas em diagonais")
@@ -192,7 +192,7 @@ def exemplo_5_testar_regras():
     todas_diagonais = all(
         abs(m[0] - 2) == abs(m[1] - 1) for m in movimentos
     )
-    print(f"   ✅ Validado" if todas_diagonais else "   ❌ Falhou")
+    print(f"   [OK] Validado" if todas_diagonais else "   [FAIL] Falhou")
     
     # Teste 3: Peça não pode se mover para posição ocupada
     print("\n3. Teste: Posições ocupadas são inacessíveis")
@@ -204,9 +204,9 @@ def exemplo_5_testar_regras():
                 for m in movimentos
             )
             if not todas_vazias:
-                print(f"   ❌ Falhou")
+                print(f"   [FAIL] Falhou")
                 return
-    print(f"   ✅ Validado")
+    print(f"   [OK] Validado")
 
 
 if __name__ == "__main__":
@@ -222,5 +222,5 @@ if __name__ == "__main__":
     exemplo_5_testar_regras()
     
     print("\n" * 2)
-    print("✅ Todos os exemplos executados com sucesso!")
+    print("[OK] Todos os exemplos executados com sucesso!")
     print("")

@@ -15,7 +15,7 @@ from src.models import Jogador, Tabuleiro, TipoPeca, Peca
 
 def teste_inicializacao():
     """Testa se o jogo é inicializado corretamente."""
-    print("📋 Testando inicialização...")
+    print("[TEST] Testando inicialização...")
 
     jogo = Jogo()
 
@@ -29,14 +29,14 @@ def teste_inicializacao():
     assert pecas_j1 == 12, f"Jogador 1 deveria ter 12 peças, tem {pecas_j1}"
     assert pecas_j2 == 12, f"Jogador 2 deveria ter 12 peças, tem {pecas_j2}"
 
-    print("✅ Inicialização OK")
+    print("[OK] Inicialização OK")
     print(f"   - J1: {pecas_j1} peças")
     print(f"   - J2: {pecas_j2} peças\n")
 
 
 def teste_movimento_simples():
     """Testa movimento simples de uma peça."""
-    print("📋 Testando movimento simples...")
+    print("[TEST] Testando movimento simples...")
 
     jogo = Jogo()
 
@@ -61,12 +61,12 @@ def teste_movimento_simples():
     # Verificar turno
     assert jogo.jogador_atual == Jogador.JOGADOR2, "Turno não mudou"
 
-    print("✅ Movimento Simples OK\n")
+    print("[OK] Movimento Simples OK\n")
 
 
 def teste_movimento_remove_origem():
     """Garante que a casa de origem fica vazia após o movimento."""
-    print("📋 Testando limpeza da casa de origem...")
+    print("[TEST] Testando limpeza da casa de origem...")
 
     jogo = Jogo()
     assert jogo.selecionar_peca(5, 0), "Não conseguiu selecionar peça"
@@ -77,12 +77,12 @@ def teste_movimento_remove_origem():
     assert jogo.tabuleiro.obter_peca(5, 0) is None, "A origem deveria ficar vazia"
     assert jogo.tabuleiro.obter_peca(dest_linha, dest_coluna) is not None, "Destino deveria conter a peça"
 
-    print("✅ Limpeza da Origem OK\n")
+    print("[OK] Limpeza da Origem OK\n")
 
 
 def teste_captura():
     """Testa captura de peça."""
-    print("📋 Testando captura...")
+    print("[TEST] Testando captura...")
 
     jogo = Jogo()
 
@@ -91,39 +91,39 @@ def teste_captura():
                             for _ in range(Tabuleiro.TAMANHO)]
 
     # Peça de J1 em (5, 0) - peça comum que captura para cima (direção -1)
-    # (5+0)%2=1 -> casa preta ✓
+    # (5+0)%2=1 -> casa preta
     peca_j1 = Peca(Jogador.JOGADOR1, 5, 0)
     jogo.tabuleiro.colocar_peca(peca_j1, 5, 0)
 
     # Peça de J2 em (4, 1) - peça adversária na diagonal
-    # (4+1)%2=1 -> casa preta ✓
+    # (4+1)%2=1 -> casa preta
     peca_j2 = Peca(Jogador.JOGADOR2, 4, 1)
     jogo.tabuleiro.colocar_peca(peca_j2, 4, 1)
 
     # Espaço vazio em (3, 2) - destino da captura
-    # (3+2)%2=1 -> casa preta ✓
+    # (3+2)%2=1 -> casa preta
 
     capturas = jogo.encontrar_capturas_para_peca(5, 0)
     assert len(capturas) > 0, "Captura não foi encontrada"
     assert (3, 2) in capturas, f"Posição de captura incorreta: {capturas}"
 
-    print("✅ Captura OK\n")
+    print("[OK] Captura OK\n")
 
 
 def teste_captura_obrigatoria():
     """Testa se o jogo bloqueia movimentos simples quando existe captura."""
-    print("📋 Testando captura obrigatória...")
+    print("[TEST] Testando captura obrigatória...")
 
     jogo = Jogo()
     jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
                            for _ in range(Tabuleiro.TAMANHO)]
 
     # Configurar cenário: peça J1 em (5,0) pode capturar J2 em (4,1)
-    # (5+0)%2=1 -> casa preta ✓
+    # (5+0)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 5, 0), 5, 0)
-    # (5+4)%2=1 -> casa preta ✓
+    # (5+4)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 5, 4), 5, 4)
-    # (4+1)%2=1 -> casa preta ✓
+    # (4+1)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 4, 1), 4, 1)
 
     # Selecionar peça que tem captura disponível
@@ -134,24 +134,24 @@ def teste_captura_obrigatoria():
     # Outra peça sem captura não deveria ser selecionável quando há capturas
     assert not jogo.selecionar_peca(5, 4), "Peça sem captura não deveria ser selecionável"
 
-    print("✅ Captura Obrigatória OK\n")
+    print("[OK] Captura Obrigatória OK\n")
 
 
 def teste_captura_sequencial():
     """Testa se a captura em sequência mantém o turno e atualiza os próximos lances."""
-    print("📋 Testando captura sequencial...")
+    print("[TEST] Testando captura sequencial...")
 
     jogo = Jogo()
     jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
                            for _ in range(Tabuleiro.TAMANHO)]
 
     # Configurar cenário de captura sequencial para J1 (subindo)
-    # (5+0)%2=1 -> casa preta ✓
+    # (5+0)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 5, 0), 5, 0)
-    # (4+1)%2=1 -> casa preta ✓
+    # (4+1)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 4, 1), 4, 1)
     # (2+2)%2=0 -> casa branca, não serve
-    # (2+3)%2=1 -> casa preta ✓
+    # (2+3)%2=1 -> casa preta
     jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 2, 3), 2, 3)
 
     # Garantir que é o turno do Jogador 1
@@ -181,14 +181,14 @@ def teste_captura_sequencial():
     assert not jogo.em_sequencia_captura, "A sequência deveria terminar após a última captura"
     assert jogo.jogador_atual == Jogador.JOGADOR2, "O turno deveria passar após a sequência"
     assert jogo.tabuleiro.obter_peca(2, 3) is None, "Segunda peça capturada deveria sair do tabuleiro"
-    assert jogo.piezas_capturadas_j1 == 2, "Contagem de capturas do Jogador 1 incorreta"
+    assert jogo.pecas_capturadas_j1 == 2, "Contagem de capturas do Jogador 1 incorreta"
 
-    print("✅ Captura Sequencial OK\n")
+    print("[OK] Captura Sequencial OK\n")
 
 
 def teste_promocao():
     """Testa promoção de peça a dama."""
-    print("📋 Testando promoção...")
+    print("[TEST] Testando promoção...")
 
     jogo = Jogo()
 
@@ -197,7 +197,7 @@ def teste_promocao():
                            for _ in range(Tabuleiro.TAMANHO)]
 
     # Criar peça de J1 perto do topo (linha 1)
-    # (1+0)%2=1 -> casa preta ✓
+    # (1+0)%2=1 -> casa preta
     peca = Peca(Jogador.JOGADOR1, 1, 0)
     jogo.tabuleiro.colocar_peca(peca, 1, 0)
 
@@ -214,17 +214,17 @@ def teste_promocao():
     assert peca_promovida.eh_dama(), f"Peça não foi promovida a dama (tipo: {peca_promovida.tipo})"
     assert peca_promovida.tipo == TipoPeca.DAMA, "Tipo de peça incorreto"
 
-    print("✅ Promoção OK\n")
+    print("[OK] Promoção OK\n")
 
 
 def teste_movimentos_dama():
     """Testa movimentos de dama (frente e trás)."""
-    print("📋 Testando movimentos de dama...")
+    print("[TEST] Testando movimentos de dama...")
 
     jogo = Jogo()
 
     # Criar uma dama manualmente em casa preta
-    # (4+3)%2=1 -> casa preta ✓
+    # (4+3)%2=1 -> casa preta
     peca_j1 = jogo.tabuleiro.remover_peca(5, 0)  # Remove peça de J1
     peca_j1.promover()
     jogo.tabuleiro.colocar_peca(peca_j1, 4, 3)
@@ -242,12 +242,12 @@ def teste_movimentos_dama():
 
     assert tem_frente or tem_tras, "Dama não pode se mover"
 
-    print("✅ Movimentos de Dama OK\n")
+    print("[OK] Movimentos de Dama OK\n")
 
 
 def teste_fim_de_jogo():
     """Testa detecção de fim de jogo."""
-    print("📋 Testando detecção de fim de jogo...")
+    print("[TEST] Testando detecção de fim de jogo...")
 
     jogo = Jogo()
 
@@ -263,12 +263,153 @@ def teste_fim_de_jogo():
     assert fim, "Fim de jogo não foi detectado"
     assert vencedor == Jogador.JOGADOR1, f"Vencedor incorreto: {vencedor}"
 
-    print("✅ Detecção de Fim de Jogo OK\n")
+    print("[OK] Detecção de Fim de Jogo OK\n")
+
+
+def teste_desfazer_jogada_simples():
+    """Desfazer um movimento simples restaura tabuleiro e turno."""
+    print("[TEST] Testando desfazer de movimento simples...")
+
+    jogo = Jogo()
+
+    jogo.selecionar_peca(5, 0)
+    dest_linha, dest_coluna = jogo.movimentos_validos[0]
+    jogo.mover_peca(5, 0, dest_linha, dest_coluna)
+
+    assert jogo.jogador_atual == Jogador.JOGADOR2, "Turno deveria ter alternado"
+    assert jogo.tabuleiro.obter_peca(5, 0) is None, "Origem deveria estar vazia"
+
+    assert jogo.desfazer_jogada(), "desfazer_jogada deveria retornar True"
+
+    assert jogo.jogador_atual == Jogador.JOGADOR1, "Turno deveria voltar para J1"
+    assert jogo.tabuleiro.obter_peca(5, 0) is not None, "Peça deveria voltar à origem"
+    assert jogo.tabuleiro.obter_peca(dest_linha, dest_coluna) is None, "Destino deveria ficar vazio"
+    assert len(jogo.historico_jogadas) == 0, "Histórico deveria estar vazio"
+
+    print("[OK] Desfazer Movimento Simples OK\n")
+
+
+def teste_desfazer_captura():
+    """Desfazer uma captura restaura a peça capturada e o contador."""
+    print("[TEST] Testando desfazer de captura...")
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 5, 0), 5, 0)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 4, 1), 4, 1)
+    jogo.jogador_atual = Jogador.JOGADOR1
+
+    assert jogo.selecionar_peca(5, 0)
+    assert jogo.mover_peca(5, 0, 3, 2), "Captura deveria ter sucesso"
+    assert jogo.pecas_capturadas_j1 == 1, "Contador de capturas deveria ser 1"
+    assert jogo.tabuleiro.obter_peca(4, 1) is None, "Peça capturada saiu do tabuleiro"
+
+    assert jogo.desfazer_jogada(), "desfazer_jogada falhou"
+
+    restaurada = jogo.tabuleiro.obter_peca(4, 1)
+    assert restaurada is not None, "Peça capturada deveria ter voltado"
+    assert restaurada.pertence_ao_jogador(Jogador.JOGADOR2), "Peça restaurada deveria ser de J2"
+    assert jogo.tabuleiro.obter_peca(5, 0) is not None, "Peça de J1 deveria voltar à origem"
+    assert jogo.tabuleiro.obter_peca(3, 2) is None, "Destino deveria ficar vazio"
+    assert jogo.pecas_capturadas_j1 == 0, "Contador de capturas deveria voltar a 0"
+    assert jogo.jogador_atual == Jogador.JOGADOR1, "Turno deveria voltar para J1"
+
+    print("[OK] Desfazer Captura OK\n")
+
+
+def teste_desfazer_promocao():
+    """Desfazer um movimento que promoveu deve despromover a peça."""
+    print("[TEST] Testando desfazer de promoção...")
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 1, 0), 1, 0)
+    jogo.jogador_atual = Jogador.JOGADOR1
+
+    jogo.selecionar_peca(1, 0)
+    assert jogo.mover_peca(1, 0, 0, 1), "Movimento de promoção falhou"
+
+    peca = jogo.tabuleiro.obter_peca(0, 1)
+    assert peca.eh_dama(), "Peça deveria estar promovida"
+
+    assert jogo.desfazer_jogada(), "desfazer_jogada falhou"
+
+    peca = jogo.tabuleiro.obter_peca(1, 0)
+    assert peca is not None, "Peça deveria voltar à origem"
+    assert not peca.eh_dama(), "Peça deveria ter sido despromovida"
+    assert peca.tipo == TipoPeca.PECA, "Tipo deveria ser PECA"
+
+    print("[OK] Desfazer Promoção OK\n")
+
+
+def teste_desfazer_sequencia_captura():
+    """Desfazer durante sequência de captura restaura estado da sequência."""
+    print("[TEST] Testando desfazer de sequência de captura...")
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 5, 0), 5, 0)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 4, 1), 4, 1)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 2, 3), 2, 3)
+    jogo.jogador_atual = Jogador.JOGADOR1
+
+    jogo.selecionar_peca(5, 0)
+    jogo.mover_peca(5, 0, 3, 2)
+
+    assert jogo.em_sequencia_captura, "Deveria estar em sequência de captura"
+
+    # Desfazer a primeira captura — volta ao estado inicial da sequência
+    assert jogo.desfazer_jogada(), "desfazer_jogada falhou"
+
+    assert not jogo.em_sequencia_captura, "em_sequencia_captura deveria voltar a False"
+    assert jogo.tabuleiro.obter_peca(5, 0) is not None, "Peça de J1 deveria voltar"
+    assert jogo.tabuleiro.obter_peca(4, 1) is not None, "Peça capturada deveria voltar"
+    assert jogo.pecas_capturadas_j1 == 0, "Contador deveria voltar a 0"
+    assert jogo.jogador_atual == Jogador.JOGADOR1, "Turno deveria ser de J1"
+
+    print("[OK] Desfazer Sequência de Captura OK\n")
+
+
+def teste_minimax_escolhe_captura_vantajosa():
+    """EstrategiaMinimax prefere capturar quando é a única jogada vantajosa."""
+    print("[TEST] Testando escolha de captura pela EstrategiaMinimax...")
+
+    from src.ia.estrategias import EstrategiaMinimax
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    # Cenário: J2 pode capturar J1 em (3,0) movendo (2,1) -> (4,-1)? Não.
+    # Configurar: J2 em (2,1) pode capturar J1 em (3,2), pouso em (4,3).
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 2, 1), 2, 1)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 3, 2), 3, 2)
+    jogo.jogador_atual = Jogador.JOGADOR2
+
+    estrategia = EstrategiaMinimax(profundidade=2)
+
+    movimentos = [((2, 1), (4, 3))]  # única captura
+    escolha = estrategia.escolher_movimento(jogo, movimentos)
+    assert escolha == ((2, 1), (4, 3)), f"Minimax deveria escolher a captura, escolheu {escolha}"
+
+    # Estado do jogo deve estar intacto após busca
+    assert jogo.tabuleiro.obter_peca(2, 1) is not None, "Minimax não deveria alterar o tabuleiro"
+    assert jogo.tabuleiro.obter_peca(3, 2) is not None, "Peça alvo deveria continuar presente"
+    assert jogo.jogador_atual == Jogador.JOGADOR2, "Turno não deveria mudar"
+    assert len(jogo.historico_jogadas) == 0, "Histórico deveria estar limpo"
+
+    print("[OK] Minimax escolhe captura OK\n")
 
 
 def teste_historico():
     """Testa histórico de jogadas."""
-    print("📋 Testando histórico...")
+    print("[TEST] Testando histórico...")
 
     jogo = Jogo()
 
@@ -284,7 +425,7 @@ def teste_historico():
     assert len(jogo.historico_jogadas) > 0, "Histórico vazio"
     assert jogo.historico_jogadas[0]['jogador'] == Jogador.JOGADOR1, "Jogador incorreto no histórico"
 
-    print("✅ Histórico OK\n")
+    print("[OK] Histórico OK\n")
 
 
 def main():
@@ -304,20 +445,25 @@ def main():
         teste_movimentos_dama()
         teste_fim_de_jogo()
         teste_historico()
+        teste_desfazer_jogada_simples()
+        teste_desfazer_captura()
+        teste_desfazer_promocao()
+        teste_desfazer_sequencia_captura()
+        teste_minimax_escolhe_captura_vantajosa()
 
         print("="*50)
-        print("✅ TODOS OS TESTES PASSARAM!".center(50))
+        print("[OK] TODOS OS TESTES PASSARAM!".center(50))
         print("="*50 + "\n")
 
         return True
 
     except AssertionError as e:
-        print(f"\n❌ ERRO: {e}\n")
+        print(f"\n[FAIL] ERRO: {e}\n")
         import traceback
         traceback.print_exc()
         return False
     except Exception as e:
-        print(f"\n❌ ERRO INESPERADO: {e}\n")
+        print(f"\n[FAIL] ERRO INESPERADO: {e}\n")
         import traceback
         traceback.print_exc()
         return False
