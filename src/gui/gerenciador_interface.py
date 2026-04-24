@@ -87,6 +87,10 @@ class GerenciadorInterface:
                             command=self._novo_jogo, width=15)
         btn_novo.pack(side=tk.LEFT, padx=5)
 
+        btn_desfazer = tk.Button(frame_botoes, text="Desfazer",
+                                 command=self._desfazer, width=15)
+        btn_desfazer.pack(side=tk.LEFT, padx=5)
+
         btn_historico = tk.Button(frame_botoes, text="Histórico",
                                  command=self._mostrar_historico, width=15)
         btn_historico.pack(side=tk.LEFT, padx=5)
@@ -120,8 +124,8 @@ class GerenciadorInterface:
         pecas_j2 = self.jogo.tabuleiro.contar_pecas(Jogador.JOGADOR2)
         self.label_pecas.config(
             text=f"Peças - J1: {pecas_j1} | J2: {pecas_j2} | "
-                 f"Capturadas - J1: {self.jogo.piezas_capturadas_j1} | "
-                 f"J2: {self.jogo.piezas_capturadas_j2}"
+                 f"Capturadas - J1: {self.jogo.pecas_capturadas_j1} | "
+                 f"J2: {self.jogo.pecas_capturadas_j2}"
         )
 
     def _ao_clicar_canvas(self, event) -> None:
@@ -183,6 +187,18 @@ class GerenciadorInterface:
     def _novo_jogo(self) -> None:
         """Inicia um novo jogo."""
         self.jogo.resetar()
+        self.fim_de_jogo_exibido = False
+        self._atualizar_tela()
+
+    def _desfazer(self) -> None:
+        """Desfaz a última jogada. No modo IA, desfaz também o lance anterior do humano."""
+        if not self.jogo.historico_jogadas:
+            return
+
+        self.jogo.desfazer_jogada()
+        if getattr(self.jogo, 'modo_ia', False) and self.jogo.historico_jogadas:
+            self.jogo.desfazer_jogada()
+
         self.fim_de_jogo_exibido = False
         self._atualizar_tela()
 

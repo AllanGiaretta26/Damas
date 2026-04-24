@@ -1,174 +1,152 @@
 """
-Jogo de Damas em Python com Interface Gráfica
+Jogo de Damas em Python com Interface Gráfica.
 Ponto de entrada principal da aplicação.
-
-Este programa implementa um jogo de damas completo com as seguintes características:
-- Interface gráfica em tkinter
-- Tabuleiro 8x8 com cores alternadas
-- Peças distribuídas corretamente
-- Movimentos válidos apenas nas diagonais (preto e branco)
-- Regras completas: movimentos simples, capturas, promoções
-- Sistema de turnos entre dois jogadores
-- Destaque visual para movimentos válidos
-- Validação automática de jogadas
-- Detecção de fim de jogo
-- IA simples (opcional) para jogar contra o computador
-- Histórico de jogadas
-- Reinício de partida
-
-Refatorado com princípios SOLID e Clean Code.
 """
 
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import ttk
 from src.gui import GUIJogo
-from src.game import Jogo
 from src.models import Jogador
 from src.ia import IA
 
 
 class AplicacaoDamas:
-    """
-    Classe principal da aplicação que gerencia a seleção de modo de jogo
-    e a inicialização da interface gráfica.
-    
-    Responsabilidades:
-    - Exibir tela inicial de seleção de modo
-    - Iniciar jogo no modo selecionado
-    - Configurar IA quando necessário
-    
-    Segue SRP: apenas gerencia fluxo inicial da aplicação.
-    """
+    """Gerencia a tela inicial (seleção de modo/dificuldade/cor) e lança o jogo."""
 
     def __init__(self):
-        """Inicializa a aplicação."""
         self.janela = tk.Tk()
-        self.modo_jogo = None
-        self.ia = None
-        self._criar_tela_inicial()
-
-    def _criar_tela_inicial(self) -> None:
-        """Cria a tela inicial de seleção de modo."""
         self.janela.title("Jogo de Damas")
-        self.janela.geometry("400x300")
+        self.janela.geometry("400x420")
         self.janela.resizable(False, False)
+        self._mostrar_menu_principal()
 
-        # Frame principal
-        frame_principal = tk.Frame(self.janela, bg="#CCCCCC")
-        frame_principal.pack(fill=tk.BOTH, expand=True)
+    def _limpar_janela(self) -> None:
+        for widget in self.janela.winfo_children():
+            widget.destroy()
 
-        # Título
-        titulo = tk.Label(frame_principal, text="Bem-vindo ao Jogo de Damas!",
-                         font=("Arial", 18, "bold"), bg="#CCCCCC")
-        titulo.pack(pady=20)
+    def _mostrar_menu_principal(self) -> None:
+        """Tela inicial com escolha de modo."""
+        self._limpar_janela()
+        frame = tk.Frame(self.janela, bg="#CCCCCC")
+        frame.pack(fill=tk.BOTH, expand=True)
 
-        # Subtítulo
-        subtitulo = tk.Label(frame_principal,
-                            text="Escolha o modo de jogo:",
-                            font=("Arial", 12), bg="#CCCCCC")
-        subtitulo.pack(pady=10)
+        tk.Label(frame, text="Bem-vindo ao Jogo de Damas!",
+                 font=("Arial", 18, "bold"), bg="#CCCCCC").pack(pady=20)
+        tk.Label(frame, text="Escolha o modo de jogo:",
+                 font=("Arial", 12), bg="#CCCCCC").pack(pady=10)
 
-        # Botão para jogar contra humano
-        btn_humano = tk.Button(
-            frame_principal,
-            text="👥 Dois Jogadores\n(Humano vs Humano)",
-            font=("Arial", 12, "bold"),
-            width=25, height=3,
-            bg="#FF6B6B",
-            activebackground="#FF5555",
+        tk.Button(
+            frame,
+            text="Dois Jogadores\n(Humano vs Humano)",
+            font=("Arial", 12, "bold"), width=25, height=3,
+            bg="#FF6B6B", activebackground="#FF5555",
             command=lambda: self._iniciar_jogo("humano")
-        )
-        btn_humano.pack(pady=10)
+        ).pack(pady=10)
 
-        # Botão para jogar contra IA
-        btn_ia = tk.Button(
-            frame_principal,
-            text="🤖 Contra a IA\n(Humano vs Computador)",
-            font=("Arial", 12, "bold"),
-            width=25, height=3,
-            bg="#4A90E2",
-            activebackground="#3A7FD7",
-            command=lambda: self._iniciar_jogo("ia")
-        )
-        btn_ia.pack(pady=10)
+        tk.Button(
+            frame,
+            text="Contra a IA\n(Humano vs Computador)",
+            font=("Arial", 12, "bold"), width=25, height=3,
+            bg="#4A90E2", activebackground="#3A7FD7",
+            command=self._mostrar_opcoes_ia
+        ).pack(pady=10)
 
-        # Botão para sair
-        btn_sair = tk.Button(
-            frame_principal,
-            text="Sair",
-            font=("Arial", 12),
-            width=25,
-            bg="#CCCCCC",
-            command=self.janela.quit
-        )
-        btn_sair.pack(pady=10)
+        tk.Button(
+            frame, text="Sair", font=("Arial", 12), width=25,
+            bg="#CCCCCC", command=self.janela.quit
+        ).pack(pady=10)
 
-        # Informações
-        info = tk.Label(
-            frame_principal,
-            text="Jogador 1: Vermelho | Jogador 2: Azul",
-            font=("Arial", 9),
-            bg="#CCCCCC"
-        )
-        info.pack(pady=20)
+        tk.Label(
+            frame, text="Jogador 1: Vermelho | Jogador 2: Azul",
+            font=("Arial", 9), bg="#CCCCCC"
+        ).pack(pady=20)
 
-    def _iniciar_jogo(self, modo: str) -> None:
-        """
-        Inicia o jogo no modo especificado.
-        
-        Args:
-            modo: Modo de jogo ("humano" ou "ia")
-        """
-        self.modo_jogo = modo
+    def _mostrar_opcoes_ia(self) -> None:
+        """Tela de opções do modo contra IA: dificuldade e cor do humano."""
+        self._limpar_janela()
+        frame = tk.Frame(self.janela, bg="#CCCCCC")
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(frame, text="Contra a IA",
+                 font=("Arial", 16, "bold"), bg="#CCCCCC").pack(pady=15)
+
+        tk.Label(frame, text="Dificuldade:",
+                 font=("Arial", 11), bg="#CCCCCC").pack(pady=(10, 2))
+        dificuldade_var = tk.StringVar(value="medio")
+        combo = ttk.Combobox(
+            frame, textvariable=dificuldade_var, state="readonly",
+            values=["facil", "medio", "dificil"], width=20
+        )
+        combo.pack(pady=5)
+
+        tk.Label(frame, text="Sua cor:",
+                 font=("Arial", 11), bg="#CCCCCC").pack(pady=(15, 2))
+        cor_var = tk.StringVar(value="vermelho")
+        tk.Radiobutton(
+            frame, text="Vermelho (começa)", variable=cor_var, value="vermelho",
+            bg="#CCCCCC", font=("Arial", 10)
+        ).pack()
+        tk.Radiobutton(
+            frame, text="Azul (IA começa)", variable=cor_var, value="azul",
+            bg="#CCCCCC", font=("Arial", 10)
+        ).pack()
+
+        tk.Button(
+            frame, text="Iniciar Jogo", font=("Arial", 12, "bold"),
+            width=20, bg="#4A90E2", activebackground="#3A7FD7",
+            command=lambda: self._iniciar_jogo(
+                "ia",
+                dificuldade=dificuldade_var.get(),
+                cor_humano=(Jogador.JOGADOR1 if cor_var.get() == "vermelho"
+                            else Jogador.JOGADOR2),
+            )
+        ).pack(pady=20)
+
+        tk.Button(
+            frame, text="Voltar", font=("Arial", 10), width=15,
+            command=self._mostrar_menu_principal
+        ).pack()
+
+    def _iniciar_jogo(self, modo: str, dificuldade: str = "medio",
+                      cor_humano: Jogador = Jogador.JOGADOR1) -> None:
+        """Fecha o menu e abre a janela do jogo."""
         self.janela.destroy()
 
-        # Criar nova janela para o jogo
         janela_jogo = tk.Tk()
         gui = GUIJogo(janela_jogo)
 
         if modo == "ia":
-            self.ia = IA(gui.jogo)
-            self._configurar_ia(gui)
+            jogador_ia = (Jogador.JOGADOR2 if cor_humano == Jogador.JOGADOR1
+                          else Jogador.JOGADOR1)
+            gui.jogo.modo_ia = True
+            ia = IA(gui.jogo, dificuldade=dificuldade, jogador=jogador_ia)
+            self._configurar_ia(gui, ia)
+
+            # Se a IA joga primeiro (humano escolheu azul), disparar após render inicial
+            if gui.jogo.jogador_atual == ia.jogador:
+                gui.janela.after(500, lambda: self._executar_ia(gui, ia))
 
         gui.iniciar()
 
-    def _configurar_ia(self, gui: GUIJogo) -> None:
-        """
-        Configura os callbacks para a IA jogar automaticamente.
-        
-        Args:
-            gui: Instância da GUI do jogo
-        """
+    def _configurar_ia(self, gui: GUIJogo, ia: IA) -> None:
+        """Instala callback para a IA jogar automaticamente após cada atualização."""
         def callback_ia():
-            """Chamado após cada atualização da tela."""
-            if gui.jogo.jogador_atual == Jogador.JOGADOR2:
-                # Agendar movimento da IA após 500ms
-                gui.janela.after(500, lambda: self._executar_ia(gui))
+            if gui.jogo.jogador_atual == ia.jogador:
+                gui.janela.after(500, lambda: self._executar_ia(gui, ia))
 
-        # Configurar callback no gerenciador de interface
         gui._gerenciador.callback_pos_atualizacao = callback_ia
 
-    def _executar_ia(self, gui: GUIJogo) -> None:
-        """
-        Executa o movimento da IA.
-        
-        Args:
-            gui: Instância da GUI do jogo
-        """
-        # Verificar novamente se ainda é turno da IA
-        if gui.jogo.jogador_atual == Jogador.JOGADOR2:
-            ia = IA(gui.jogo)
+    def _executar_ia(self, gui: GUIJogo, ia: IA) -> None:
+        """Executa o movimento da IA, re-verificando o turno (pode ter mudado via undo)."""
+        if gui.jogo.jogador_atual == ia.jogador:
             ia.fazer_movimento()
-            # Atualizar tela após movimento da IA
             gui._atualizar_tela()
 
     def executar(self) -> None:
-        """Executa a aplicação."""
         self.janela.mainloop()
 
 
 if __name__ == "__main__":
-    """Ponto de entrada da aplicação."""
     print("=" * 60)
     print("JOGO DE DAMAS EM PYTHON".center(60))
     print("=" * 60)
@@ -183,8 +161,8 @@ if __name__ == "__main__":
     print("\nControles:")
     print("- Clique em uma peça para selecioná-la")
     print("- Clique em uma casa destacada para mover")
-    print("- Verde = movimento simples")
-    print("- Laranja = captura")
+    print("- Verde = movimento simples | Laranja = captura")
+    print("- Botão Desfazer reverte a última jogada")
     print("=" * 60 + "\n")
 
     app = AplicacaoDamas()
