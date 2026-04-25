@@ -4,41 +4,39 @@ Exporta a classe principal GUIJogo.
 """
 
 from src.gui.gerenciador_interface import GerenciadorInterface
+from src.models import Jogador
 
 
 class GUIJogo:
     """
-    Classe principal que gerencia a interface gráfica do jogo de damas.
-    
-    Esta classe serve como fachada para o GerenciadorInterface,
-    mantendo compatibilidade com código existente.
+    Fachada sobre GerenciadorInterface.
+
+    Aceita a janela raiz já existente para que o ciclo de vida da janela
+    seja controlado externamente (arquitetura de janela única).
     """
 
-    def __init__(self, janela):
-        """
-        Inicializa a interface gráfica.
-        
-        Args:
-            janela: A janela raiz do tkinter
-        """
+    def __init__(self, janela, modo_ia: bool = False, callback_menu=None,
+                 dificuldade: str = "", cor_humano: Jogador = Jogador.JOGADOR1,
+                 placar: dict = None):
         from src.game import Jogo
-        
+
         self.janela = janela
         self.janela.title("Jogo de Damas")
-        self.janela.geometry("900x1000")
-        self.janela.resizable(False, False)
 
-        # Instância do jogo
         self.jogo = Jogo()
 
-        # Criar gerenciador de interface
-        self._gerenciador = GerenciadorInterface(self.janela, self.jogo)
+        self._gerenciador = GerenciadorInterface(
+            janela, self.jogo,
+            modo_ia=modo_ia,
+            callback_menu=callback_menu,
+            dificuldade=dificuldade,
+            cor_humano=cor_humano,
+            placar=placar,
+        )
         self._gerenciador.criar_interface()
 
     def _atualizar_tela(self) -> None:
-        """Atualiza a tela (mantido para compatibilidade com IA)."""
         self._gerenciador._atualizar_tela()
 
     def iniciar(self) -> None:
-        """Inicia a interface gráfica."""
-        self.janela.mainloop()
+        """No-op: o mainloop é gerenciado pela raiz em AplicacaoDamas.executar()."""

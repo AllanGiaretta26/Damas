@@ -10,27 +10,28 @@ Ele é importado pela interface gráfica (gui.py).
 # ============================================================
 TAMANHO_TABULEIRO = 8
 TAMANHO_CASA_PIXELS = 80
+TAMANHO_COORDENADAS_PIXELS = 20
 
 # ============================================================
 # CORES DO TABULEIRO
 # ============================================================
-COR_CASA_BRANCA = "#FFD700"      # Ouro claro
-COR_CASA_PRETA = "#000000"       # Preto
-COR_FUNDO_TABULEIRO = "#CCCCCC"  # Cinza
+COR_CASA_BRANCA = "#F0D9B5"      # Creme claro (clássico xadrez)
+COR_CASA_PRETA = "#B58863"       # Marrom (clássico xadrez)
+COR_FUNDO_TABULEIRO = "#2C3E50"  # Azul-escuro (UI moderna)
 
 # ============================================================
 # CORES DE DESTAQUE
 # ============================================================
-COR_SELECIONADA = "#FF6B6B"      # Vermelho claro
-COR_MOVIMENTO_VALIDO = "#90EE90" # Verde claro
-COR_CAPTURA = "#FFA500"          # Laranja
+COR_SELECIONADA = "#829769"      # Verde-oliva
+COR_MOVIMENTO_VALIDO = "#CDD26A" # Amarelo-verde sutil
+COR_CAPTURA = "#E05C40"          # Laranja-vermelho
 
 # ============================================================
 # CORES DAS PEÇAS
 # ============================================================
-COR_PECA_JOGADOR1 = "#FF0000"    # Vermelho
-COR_PECA_JOGADOR2 = "#0000FF"    # Azul
-COR_DAMA = "#FFD700"             # Ouro (coroa da dama)
+COR_PECA_JOGADOR1 = "#E74C3C"    # Vermelho vivo
+COR_PECA_JOGADOR2 = "#3498DB"    # Azul suave
+COR_DAMA = "#F1C40F"             # Ouro vivo (coroa da dama)
 
 # ============================================================
 # CONFIGURAÇÕES DE TEXTO
@@ -39,16 +40,24 @@ FONTE_TITULO = ("Arial", 18, "bold")
 FONTE_INFO = ("Arial", 12)
 FONTE_PEQUENA = ("Arial", 10)
 
+# Cores de texto sobre fundo escuro
+COR_TEXTO_PRINCIPAL = "#ECF0F1"
+COR_TEXTO_SECUNDARIO = "#BDC3C7"
+
 # ============================================================
 # CONFIGURAÇÕES DE BOTÕES
 # ============================================================
-COR_BOTAO_NOVO = "#FF6B6B"      # Vermelho claro
-COR_BOTAO_NOVO_HOVER = "#FF5555" # Vermelho mais escuro
+COR_BOTAO_NOVO = "#E74C3C"       # Vermelho (Novo Jogo)
+COR_BOTAO_NOVO_HOVER = "#C0392B"
 
-COR_BOTAO_IA = "#4A90E2"         # Azul
-COR_BOTAO_IA_HOVER = "#3A7FD7"   # Azul mais escuro
+COR_BOTAO_IA = "#3498DB"         # Azul (Contra IA)
+COR_BOTAO_IA_HOVER = "#2980B9"
 
-COR_BOTAO_PADRAO = "#CCCCCC"     # Cinza
+COR_BOTAO_PADRAO = "#34495E"     # Cinza-escuro (botões neutros)
+COR_BOTAO_PADRAO_HOVER = "#2C3E50"
+
+COR_BOTAO_EMPATE = "#D35400"     # Laranja-escuro (Empate)
+COR_BOTAO_EMPATE_HOVER = "#A04000"
 
 # ============================================================
 # CONFIGURAÇÕES DE IA
@@ -77,9 +86,9 @@ CONTAR_REMOVIDAS = True
 TEMA_ESCURO = {
     "COR_CASA_BRANCA": "#333333",
     "COR_CASA_PRETA": "#555555",
-    "COR_FUNDO_TABULEIRO": "#222222",
-    "COR_PECA_JOGADOR1": "#FF6B6B",
-    "COR_PECA_JOGADOR2": "#6B9FFF",
+    "COR_FUNDO_TABULEIRO": "#1A1A2E",
+    "COR_PECA_JOGADOR1": "#E74C3C",
+    "COR_PECA_JOGADOR2": "#3498DB",
 }
 
 TEMA_NATURAL = {

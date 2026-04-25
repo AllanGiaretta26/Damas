@@ -38,6 +38,8 @@ class Jogo:
         
         # Estado de captura sequencial
         self._em_sequencia_captura = False
+
+        self.modo_ia = False
         
         # Inicializar serviços (Dependency Injection)
         self._movimento_validator = MovimentoValidator(self.tabuleiro)
