@@ -428,6 +428,129 @@ def teste_historico():
     print("[OK] Histórico OK\n")
 
 
+def teste_movimentos_dama_jogador2():
+    """Dama de J2 pode mover para frente e para tras."""
+    print("[TEST] Testando movimentos de dama do Jogador 2...")
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    peca_j2 = Peca(Jogador.JOGADOR2, 3, 4)
+    peca_j2.promover()
+    jogo.tabuleiro.colocar_peca(peca_j2, 3, 4)
+    jogo.jogador_atual = Jogador.JOGADOR2
+
+    assert jogo.selecionar_peca(3, 4), "Nao conseguiu selecionar dama J2"
+    movimentos = jogo.movimentos_validos
+    assert len(movimentos) > 0, "Dama J2 sem movimentos"
+
+    tem_frente = any(m[0] > 3 for m in movimentos)
+    tem_tras = any(m[0] < 3 for m in movimentos)
+    assert tem_frente and tem_tras, "Dama J2 deveria mover em ambas as direcoes"
+
+    print("[OK] Movimentos de Dama J2 OK\n")
+
+
+def teste_ia_como_jogador1():
+    """IA configurada como J1 encontra e executa movimentos validos."""
+    print("[TEST] Testando IA jogando como Jogador 1...")
+
+    from src.ia import IA
+
+    jogo = Jogo()
+    ia = IA(jogo, dificuldade="facil", jogador=Jogador.JOGADOR1)
+
+    assert jogo.jogador_atual == Jogador.JOGADOR1, "Turno inicial deve ser J1"
+    sucesso = ia.fazer_movimento()
+    assert sucesso, "IA como J1 deveria conseguir fazer movimento"
+    assert jogo.jogador_atual == Jogador.JOGADOR2, "Turno deve passar para J2 apos movimento"
+    assert len(jogo.historico_jogadas) == 1, "Historico deve ter 1 jogada"
+
+    print("[OK] IA como Jogador 1 OK\n")
+
+
+def teste_empate_sem_movimentos():
+    """Jogador sem movimentos disponíveis perde (detectado como fim de jogo)."""
+    print("[TEST] Testando fim de jogo por falta de movimentos...")
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    # J1 encurralado em (7,0): (6,1) ocupado por J2 bloqueia o movimento;
+    # (5,2) tambem ocupado por J2 bloqueia a captura; (6,-1) e' invalido.
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 7, 0), 7, 0)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 6, 1), 6, 1)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 5, 2), 5, 2)
+    jogo.jogador_atual = Jogador.JOGADOR1
+
+    fim, vencedor = jogo.verificar_fim_de_jogo()
+    assert fim, "Deveria detectar fim de jogo"
+    assert vencedor == Jogador.JOGADOR2, f"J2 deveria vencer, vencedor: {vencedor}"
+
+    print("[OK] Fim de Jogo por Falta de Movimentos OK\n")
+
+
+def teste_estrategia_facil():
+    """EstrategiaFacil retorna um movimento valido da lista."""
+    print("[TEST] Testando EstrategiaFacil...")
+
+    from src.ia.estrategias import EstrategiaFacil
+
+    jogo = Jogo()
+    estrategia = EstrategiaFacil()
+
+    movimentos = [((5, 0), (4, 1)), ((5, 2), (4, 1)), ((5, 2), (4, 3))]
+    escolha = estrategia.escolher_movimento(jogo, movimentos)
+    assert escolha in movimentos, f"Escolha invalida: {escolha}"
+
+    assert estrategia.escolher_movimento(jogo, []) is None, "Lista vazia deve retornar None"
+
+    print("[OK] EstrategiaFacil OK\n")
+
+
+def teste_estrategia_normal_prefere_captura():
+    """EstrategiaNormal escolhe captura quando disponivel."""
+    print("[TEST] Testando EstrategiaNormal prefere captura...")
+
+    from src.ia.estrategias import EstrategiaNormal
+
+    jogo = Jogo()
+    jogo.tabuleiro._casas = [[None for _ in range(Tabuleiro.TAMANHO)]
+                             for _ in range(Tabuleiro.TAMANHO)]
+
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR2, 2, 1), 2, 1)
+    jogo.tabuleiro.colocar_peca(Peca(Jogador.JOGADOR1, 3, 2), 3, 2)
+    jogo.jogador_atual = Jogador.JOGADOR2
+
+    estrategia = EstrategiaNormal()
+    # Captura: (2,1)->(4,3); movimento simples: (2,1)->(3,0)
+    movimentos = [((2, 1), (4, 3)), ((2, 1), (3, 0))]
+    escolha = estrategia.escolher_movimento(jogo, movimentos)
+    assert escolha == ((2, 1), (4, 3)), f"Normal deveria escolher captura, escolheu {escolha}"
+
+    print("[OK] EstrategiaNormal prefere captura OK\n")
+
+
+def teste_estrategia_normal_fallback():
+    """EstrategiaNormal retorna movimento mesmo sem opcoes safe/promo/captura."""
+    print("[TEST] Testando EstrategiaNormal fallback...")
+
+    from src.ia.estrategias import EstrategiaNormal
+
+    jogo = Jogo()
+    estrategia = EstrategiaNormal()
+
+    # Movimento simples para posicao "insegura" — deve retornar mesmo assim
+    movimentos = [((5, 0), (4, 1))]
+    escolha = estrategia.escolher_movimento(jogo, movimentos)
+    assert escolha is not None, "EstrategiaNormal nao deve retornar None com movimentos disponíveis"
+    assert escolha in movimentos, f"Escolha invalida: {escolha}"
+
+    print("[OK] EstrategiaNormal fallback OK\n")
+
+
 def main():
     """Executa todos os testes."""
     print("\n" + "="*50)
@@ -443,13 +566,19 @@ def main():
         teste_captura_sequencial()
         teste_promocao()
         teste_movimentos_dama()
+        teste_movimentos_dama_jogador2()
         teste_fim_de_jogo()
+        teste_empate_sem_movimentos()
         teste_historico()
         teste_desfazer_jogada_simples()
         teste_desfazer_captura()
         teste_desfazer_promocao()
         teste_desfazer_sequencia_captura()
         teste_minimax_escolhe_captura_vantajosa()
+        teste_ia_como_jogador1()
+        teste_estrategia_facil()
+        teste_estrategia_normal_prefere_captura()
+        teste_estrategia_normal_fallback()
 
         print("="*50)
         print("[OK] TODOS OS TESTES PASSARAM!".center(50))
