@@ -54,14 +54,10 @@ cd Damas
 python main.py
 ```
 
-Alternativamente, use os scripts prontos:
+No Windows, o script alternativo também funciona:
 
-```bash
-# Windows
-scripts/executar_jogo.bat
-
-# Linux / macOS
-bash scripts/executar_jogo.sh
+```bat
+scripts\executar_jogo.bat
 ```
 
 ### Executar Testes
@@ -83,7 +79,9 @@ python tests/teste_jogo.py
    - Verde = movimento simples
    - Laranja = captura
 5. Capturas são obrigatórias quando disponíveis
-6. Use o botão **Desfazer** para reverter a última jogada — no modo IA, desfaz também a resposta da IA
+6. Use o botão **Desfazer** para reverter a última jogada (modo IA)
+7. Use o botão **Empate** para encerrar a partida sem vencedor
+8. Use o botão **Menu** para voltar ao menu inicial sem fechar o app
 
 **Cores:** Vermelho = Jogador 1 | Azul = Jogador 2 / IA | Coroa = dama promovida
 
@@ -97,7 +95,7 @@ python tests/teste_jogo.py
 | Médio | Minimax com poda alfa-beta (profundidade 3) | ~50–200 ms |
 | Difícil | Minimax com poda alfa-beta (profundidade 5) | ~0.1–3 s |
 
-A função de avaliação é baseada em material: peça comum vale 1 ponto, dama vale 3. Movimentos de captura são explorados primeiro para melhorar a eficiência da poda.
+A função de avaliação considera material (peça comum = 1 ponto, dama = 3) e posição: bônus de centralização e bônus de proteção para peças na linha de fundo. Movimentos de captura são explorados primeiro para melhorar a eficiência da poda.
 
 ---
 
@@ -116,8 +114,7 @@ Damas/
 ├── tests/
 │   └── teste_jogo.py
 └── scripts/
-    ├── executar_jogo.bat
-    └── executar_jogo.sh
+    └── executar_jogo.bat
 ```
 
 ---
@@ -160,7 +157,7 @@ brew install python-tk
 
 ## Licença
 
-Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está sob a licença [MIT](./LICENSE).
 
 ---
 
