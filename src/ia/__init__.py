@@ -74,25 +74,24 @@ class IA:
     def _encontrar_todos_movimentos(self) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
         """Encontra todos os movimentos possíveis para a IA no turno atual."""
         movimentos = []
-
         jogador_original = self.jogo.jogador_atual
         self.jogo.jogador_atual = self.jogador
-
-        for linha in range(Tabuleiro.TAMANHO):
-            for coluna in range(Tabuleiro.TAMANHO):
-                peca = self.jogo.tabuleiro.obter_peca(linha, coluna)
-                if peca is None or not peca.pertence_ao_jogador(self.jogador):
-                    continue
-
-                if self.jogo.em_sequencia_captura:
-                    selecionada = self.jogo.peca_selecionada
-                    if selecionada is None or \
-                       (linha, coluna) != (selecionada.linha, selecionada.coluna):
+        try:
+            for linha in range(Tabuleiro.TAMANHO):
+                for coluna in range(Tabuleiro.TAMANHO):
+                    peca = self.jogo.tabuleiro.obter_peca(linha, coluna)
+                    if peca is None or not peca.pertence_ao_jogador(self.jogador):
                         continue
 
-                movs_validos = self.jogo.obter_movimentos_validos_para_peca(linha, coluna)
-                for mov_linha, mov_coluna in movs_validos:
-                    movimentos.append(((linha, coluna), (mov_linha, mov_coluna)))
+                    if self.jogo.em_sequencia_captura:
+                        selecionada = self.jogo.peca_selecionada
+                        if selecionada is None or \
+                           (linha, coluna) != (selecionada.linha, selecionada.coluna):
+                            continue
 
-        self.jogo.jogador_atual = jogador_original
+                    movs_validos = self.jogo.obter_movimentos_validos_para_peca(linha, coluna)
+                    for mov_linha, mov_coluna in movs_validos:
+                        movimentos.append(((linha, coluna), (mov_linha, mov_coluna)))
+        finally:
+            self.jogo.jogador_atual = jogador_original
         return movimentos

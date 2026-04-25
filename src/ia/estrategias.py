@@ -41,6 +41,7 @@ class EstrategiaNormal(EstrategiaIA):
         if not movimentos:
             return None
 
+        jogador = jogo.jogador_atual
         capturas = []
         promocoes = []
         movimentos_seguros = []
@@ -51,10 +52,10 @@ class EstrategiaNormal(EstrategiaIA):
             if diff == 2:
                 capturas.append(((linha_origem, coluna_origem),
                                (linha_destino, coluna_destino)))
-            elif self._leva_a_promocao(jogo, linha_origem, linha_destino):
+            elif self._leva_a_promocao(linha_destino):
                 promocoes.append(((linha_origem, coluna_origem),
                                 (linha_destino, coluna_destino)))
-            elif self._eh_movimento_seguro(jogo, linha_destino, coluna_destino):
+            elif self._eh_movimento_seguro(jogo, linha_destino, coluna_destino, jogador):
                 movimentos_seguros.append(((linha_origem, coluna_origem),
                                          (linha_destino, coluna_destino)))
 
@@ -64,85 +65,49 @@ class EstrategiaNormal(EstrategiaIA):
             return random.choice(promocoes)
         if movimentos_seguros:
             return random.choice(movimentos_seguros)
-        return None
+        return random.choice(movimentos)
 
-    def _leva_a_promocao(self, jogo: Jogo, linha_origem: int, linha_destino: int) -> bool:
+    @staticmethod
+    def _leva_a_promocao(linha_destino: int) -> bool:
         return linha_destino == 0 or linha_destino == 7
 
-    def _eh_movimento_seguro(self, jogo: Jogo, linha: int, coluna: int) -> bool:
-        direcoes = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    def _eh_movimento_seguro(self, jogo: Jogo, linha: int, coluna: int,
+                              jogador: Jogador) -> bool:
+        for dir_linha, dir_coluna in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            adj_linha = linha + dir_linha
+            adj_coluna = coluna + dir_coluna
 
-        for dir_linha, dir_coluna in direcoes:
-            peca_adjacente_linha = linha + dir_linha
-            peca_adjacente_coluna = coluna + dir_coluna
-
-            if not self._posicao_valida(peca_adjacente_linha, peca_adjacente_coluna):
+            if not self._posicao_valida(adj_linha, adj_coluna):
                 continue
 
-            peca_adjacente = jogo.tabuleiro.obter_peca(
-                peca_adjacente_linha, peca_adjacente_coluna
-            )
-
-            if peca_adjacente and not peca_adjacente.pertence_ao_jogador(Jogador.JOGADOR2):
-                if self._pode_capturar(jogo, peca_adjacente_linha, peca_adjacente_coluna,
-                                      linha, coluna):
+            peca_adj = jogo.tabuleiro.obter_peca(adj_linha, adj_coluna)
+            if peca_adj and not peca_adj.pertence_ao_jogador(jogador):
+                if self._pode_capturar(jogo, adj_linha, adj_coluna, linha, coluna):
                     return False
 
         return True
 
     def _escolher_melhor_captura(self, jogo: Jogo, capturas: List[Movimento]) -> Movimento:
-        """Escolhe a captura que abre mais capturas sequenciais."""
+        """Escolhe a captura que abre mais sequências usando o sistema de undo."""
         melhor = None
-        max_sequencia = 0
+        max_sequencia = -1
 
         for movimento in capturas:
-            (linha_origem, coluna_origem), (linha_destino, coluna_destino) = movimento
-            peca = jogo.tabuleiro.obter_peca(linha_origem, coluna_origem)
-            if peca is None:
+            (lo, co), (ld, cd) = movimento
+            if not jogo.mover_peca(lo, co, ld, cd):
                 continue
+            proximas = jogo.encontrar_capturas_para_peca(ld, cd)
+            sequencia = len(proximas)
+            jogo.desfazer_jogada()
 
-            peca_capturada = jogo.tabuleiro.obter_peca(
-                (linha_origem + linha_destino) // 2,
-                (coluna_origem + coluna_destino) // 2
-            )
-            tipo_original = peca.tipo
-
-            try:
-                if peca_capturada:
-                    jogo.tabuleiro.remover_peca(
-                        (linha_origem + linha_destino) // 2,
-                        (coluna_origem + coluna_destino) // 2
-                    )
-                if jogo.tabuleiro.mover_peca(
-                    linha_origem, coluna_origem, linha_destino, coluna_destino
-                ) is None:
-                    continue
-
-                jogo.tentar_promover_peca(peca)
-
-                proximas_capturas = jogo.encontrar_capturas_para_peca(
-                    linha_destino, coluna_destino
-                )
-
-                if len(proximas_capturas) > max_sequencia:
-                    max_sequencia = len(proximas_capturas)
-                    melhor = movimento
-            finally:
-                jogo.tabuleiro.mover_peca(
-                    linha_destino, coluna_destino, linha_origem, coluna_origem
-                )
-                peca.tipo = tipo_original
-                if peca_capturada:
-                    jogo.tabuleiro.colocar_peca(
-                        peca_capturada,
-                        (linha_origem + linha_destino) // 2,
-                        (coluna_origem + coluna_destino) // 2
-                    )
+            if sequencia > max_sequencia:
+                max_sequencia = sequencia
+                melhor = movimento
 
         return melhor if melhor else random.choice(capturas)
 
     def _pode_capturar(self, jogo: Jogo, peca_linha: int, peca_coluna: int,
-                      alvo_linha: int, alvo_coluna: int) -> bool:
+                       alvo_linha: int, alvo_coluna: int) -> bool:
         peca = jogo.tabuleiro.obter_peca(peca_linha, peca_coluna)
         if peca is None:
             return False
@@ -155,23 +120,24 @@ class EstrategiaNormal(EstrategiaIA):
         if not self._posicao_valida(pos_apos_linha, pos_apos_coluna):
             return False
 
-        pos_apos = jogo.tabuleiro.obter_peca(pos_apos_linha, pos_apos_coluna)
-        return pos_apos is None
+        return jogo.tabuleiro.obter_peca(pos_apos_linha, pos_apos_coluna) is None
 
-    def _posicao_valida(self, linha: int, coluna: int) -> bool:
-        return (0 <= linha < Tabuleiro.TAMANHO and
-                0 <= coluna < Tabuleiro.TAMANHO)
+    @staticmethod
+    def _posicao_valida(linha: int, coluna: int) -> bool:
+        return 0 <= linha < Tabuleiro.TAMANHO and 0 <= coluna < Tabuleiro.TAMANHO
 
 
 class EstrategiaMinimax(EstrategiaIA):
     """
-    Minimax com poda alfa-beta. Avaliação material-based (peça=1, dama=3).
+    Minimax com poda alfa-beta. Avaliação material + posicional.
     Reutiliza jogo.desfazer_jogada() para navegar a árvore sem copiar estado.
     """
 
     VALOR_PECA = 1
     VALOR_DAMA = 3
     VALOR_VITORIA = 10_000
+    BONUS_CENTRO = 0.05
+    BONUS_GUARDA_FINAL = 0.3
 
     def __init__(self, profundidade: int):
         self.profundidade = profundidade
@@ -247,38 +213,49 @@ class EstrategiaMinimax(EstrategiaIA):
             return pior
 
     def _avaliar(self, jogo: Jogo, jogador_max: Jogador) -> float:
-        score = 0
+        score = 0.0
         for linha in range(Tabuleiro.TAMANHO):
             for coluna in range(Tabuleiro.TAMANHO):
                 peca = jogo.tabuleiro.obter_peca(linha, coluna)
                 if peca is None:
                     continue
-                valor = self.VALOR_DAMA if peca.eh_dama() else self.VALOR_PECA
+                valor = float(self.VALOR_DAMA if peca.eh_dama() else self.VALOR_PECA)
+                valor += self._bonus_posicao(peca, linha, coluna)
                 if peca.pertence_ao_jogador(jogador_max):
                     score += valor
                 else:
                     score -= valor
         return score
 
+    def _bonus_posicao(self, peca: Peca, linha: int, coluna: int) -> float:
+        distancia_centro = abs(3.5 - linha) + abs(3.5 - coluna)
+        bonus = (7.0 - distancia_centro) * self.BONUS_CENTRO
+        if not peca.eh_dama():
+            if peca.jogador == Jogador.JOGADOR1 and linha == 7:
+                bonus += self.BONUS_GUARDA_FINAL
+            elif peca.jogador == Jogador.JOGADOR2 and linha == 0:
+                bonus += self.BONUS_GUARDA_FINAL
+        return bonus
+
     def _encontrar_movimentos_jogador(self, jogo: Jogo, jogador: Jogador) -> List[Movimento]:
         movimentos = []
         jog_orig = jogo.jogador_atual
         jogo.jogador_atual = jogador
-
-        for linha in range(Tabuleiro.TAMANHO):
-            for coluna in range(Tabuleiro.TAMANHO):
-                peca = jogo.tabuleiro.obter_peca(linha, coluna)
-                if peca is None or not peca.pertence_ao_jogador(jogador):
-                    continue
-                if jogo.em_sequencia_captura:
-                    selecionada = jogo.peca_selecionada
-                    if selecionada is None or (linha, coluna) != (selecionada.linha, selecionada.coluna):
+        try:
+            for linha in range(Tabuleiro.TAMANHO):
+                for coluna in range(Tabuleiro.TAMANHO):
+                    peca = jogo.tabuleiro.obter_peca(linha, coluna)
+                    if peca is None or not peca.pertence_ao_jogador(jogador):
                         continue
-                movs = jogo.obter_movimentos_validos_para_peca(linha, coluna)
-                for ml, mc in movs:
-                    movimentos.append(((linha, coluna), (ml, mc)))
-
-        jogo.jogador_atual = jog_orig
+                    if jogo.em_sequencia_captura:
+                        sel = jogo.peca_selecionada
+                        if sel is None or (linha, coluna) != (sel.linha, sel.coluna):
+                            continue
+                    movs = jogo.obter_movimentos_validos_para_peca(linha, coluna)
+                    for ml, mc in movs:
+                        movimentos.append(((linha, coluna), (ml, mc)))
+        finally:
+            jogo.jogador_atual = jog_orig
         return movimentos
 
     def _ordenar_movimentos(self, movimentos: List[Movimento]) -> List[Movimento]:
