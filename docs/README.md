@@ -1,52 +1,49 @@
-# 📚 Documentação Organizada
+# Documentação do projeto
 
-Esta pasta contém a documentação **modularizada** e fácil de navegar.
+Esta pasta contém apenas índices e subpastas. Documentação temática solta na raiz de `docs/` vira bagunça; por isso os documentos foram agrupados por papel.
 
-## 📖 Comece por aqui
+## Ordem de autoridade
 
-👉 **[indice.md](indice.md)** — Mapa completo de toda a documentação
+Use esta ordem quando houver conflito entre documentos:
 
----
+1. Código e testes.
+2. `CLAUDE.md`, por registrar regras operacionais do repositório.
+3. Documentação técnica em `docs/`.
+4. `README.md`, como guia de entrada para uso e execução.
+5. Relatórios em `docs/auditorias/`, como histórico de auditoria.
 
-## 📄 Arquivos
+## Estrutura
 
-| Arquivo | Tópico |
-|---------|--------|
-| [indice.md](indice.md) | 📍 Entrada principal com links |
-| [arquitetura.md](arquitetura.md) | 🏗️ Estrutura e camadas |
-| [models.md](models.md) | 📊 Dados puros (Peca, Tabuleiro, Enums) |
-| [services.md](services.md) | ⚙️ Lógica de regras |
-| [game.md](game.md) | 🎮 Orquestrador central (Jogo) |
-| [ia.md](ia.md) | 🤖 Motor de inteligência artificial |
-| [gui.md](gui.md) | 🎨 Interface gráfica (tkinter) |
-| [main.md](main.md) | 🚀 Aplicação e ponto de entrada |
-| [uso-exemplo.md](uso-exemplo.md) | 💡 10 exemplos práticos |
-| [pontos-atencao.md](pontos-atencao.md) | ⚠️ Erros comuns, performance, testes |
+| Pasta | Papel |
+|---|---|
+| [arquitetura/](arquitetura/) | Explicação da arquitetura e invariantes do domínio. |
+| [referencia/](referencia/) | Referência técnica de módulos, classes e contratos. |
+| [guias/](guias/) | Exemplos executáveis, cuidados e checklists de manutenção. |
+| [auditorias/](auditorias/) | Auditorias e histórico de refatoração documental. |
 
----
+## Entrada recomendada
 
-## 🎯 Guia Rápido
+1. [Arquitetura](arquitetura/visao-geral.md)
+2. [Referência técnica](referencia/README.md)
+3. [Exemplos de uso](guias/uso-exemplo.md)
+4. [Pontos de atenção](guias/pontos-atencao.md)
 
-### Para entender a arquitetura geral
-→ [arquitetura.md](arquitetura.md)
+## Regras de manutenção
 
-### Para aprender sobre um componente específico
-→ Escolha na tabela acima
+- Não adicione arquivos temáticos diretamente em `docs/`; crie ou use uma subpasta.
+- Preserve `docs/README.md` apenas como índice e política de documentação.
+- Não documente comportamento planejado como se existisse.
+- Preserve nomes de métodos, labels e chaves exatamente como aparecem no código quando forem literais.
+- Use português brasileiro para texto explicativo.
+- Evite copiar blocos grandes de implementação. Documente contratos, invariantes e pontos de extensão.
+- Ao mudar regras de jogo, atualize `docs/referencia/services.md`, `docs/referencia/game.md`, `docs/guias/pontos-atencao.md` e os testes.
+- Ao mudar interface ou labels, atualize `README.md`, `docs/referencia/gui.md` e `docs/referencia/main.md`.
 
-### Para códigos de exemplo
-→ [uso-exemplo.md](uso-exemplo.md)
+## Verificação recomendada
 
-### Para evitar erros comuns
-→ [pontos-atencao.md](pontos-atencao.md)
+```bash
+python tests/teste_jogo.py
+git diff --check
+```
 
----
-
-## 🔗 Links Importantes
-
-- **[README.md](../README.md)** — Visão geral do projeto
-- **[main.py](../main.py)** — Ponto de entrada
-- **[tests/](../tests/)** — Testes procedurais
-
----
-
-**Dúvidas?** Consulte o documento relevante na tabela acima!
+Também valide links relativos e H1 único por documento antes de entregar mudanças de documentação.
