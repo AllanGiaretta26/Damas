@@ -1,146 +1,51 @@
-# Jogo de Damas em Python
+# Damas ♟️
 
-![Python](https://img.shields.io/badge/Python-3.7%2B-blue)
-![Tkinter](https://img.shields.io/badge/GUI-tkinter-informational)
-![Status](https://img.shields.io/badge/status-concluído-brightgreen)
-![Licença](https://img.shields.io/badge/licença-MIT-lightgrey)
+![Python](https://img.shields.io/badge/Python-3.7%2B-blue?logo=python&logoColor=white)
+![tkinter](https://img.shields.io/badge/GUI-tkinter-lightgrey)
+![Status](https://img.shields.io/badge/status-conclu%C3%ADdo-brightgreen)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
 
-> Jogo de damas completo com interface gráfica em tkinter, IA baseada em minimax com poda alfa-beta e arquitetura orientada a princípios SOLID.
+> Jogo de damas desktop com interface gráfica, modo humano vs. humano e IA com três níveis de dificuldade — incluindo minimax com poda alfa-beta.
 
 ---
 
 ## Descrição
 
-Implementação do jogo de damas com todas as regras tradicionais: capturas obrigatórias, múltiplas capturas em sequência, promoção de peças a dama e desfazer jogada. O projeto oferece dois modos — duelo humano vs. humano ou partida contra uma IA com três níveis de dificuldade, incluindo minimax com poda alfa-beta nos níveis Médio e Difícil.
+Aplicação desktop de damas construída em Python puro com tkinter. O projeto implementa as regras completas do jogo — captura obrigatória, sequência de capturas, promoção a dama — e oferece um adversário controlado por IA capaz de planejar jogadas vários turnos à frente.
 
-A arquitetura segue princípios SOLID com separação clara de responsabilidades entre modelos, serviços, IA e interface gráfica.
+O código é organizado em camadas (modelos, serviços, IA, GUI) e acompanha uma suíte de testes procedurais que cobre os principais cenários do jogo.
 
----
+## Screenshot
 
-## Status do Projeto
-
-![Status](https://img.shields.io/badge/status-concluído-brightgreen)
-
-Projeto concluído e funcional.
-
----
+![Screenshot do jogo](./assets/screenshot.png)
 
 ## Tecnologias
 
-![Python](https://img.shields.io/badge/Python-3.7%2B-blue)
-![Tkinter](https://img.shields.io/badge/tkinter-GUI-informational)
-
-- **Python 3.7+** — linguagem principal
-- **tkinter** — interface gráfica (incluso na instalação padrão do Python)
-- Sem dependências externas
-
----
+- **Python 3.7+**
+- **tkinter** — interface gráfica nativa, sem dependências externas
+- **Minimax com poda alfa-beta** — motor de IA
 
 ## Como Instalar e Rodar
 
-### Pré-requisitos
-
-- Python 3.7 ou superior
-- tkinter (já incluso na maioria das instalações do Python)
-
-### Instalação
+**Pré-requisitos:** Python 3.7 ou superior com tkinter disponível.
 
 ```bash
-# Clone o repositório
 git clone https://github.com/AllanGiaretta26/Damas.git
 cd Damas
-
-# Execute o jogo
 python main.py
 ```
 
-No Windows, o script alternativo também funciona:
+No Windows, há um atalho pronto:
 
 ```bat
 scripts\executar_jogo.bat
 ```
 
-### Executar Testes
+> `requirements.txt` é apenas informativo — o projeto não tem dependências de runtime além da biblioteca padrão.
 
-```bash
-python tests/teste_jogo.py
-```
+### Problema com tkinter?
 
----
-
-## Como Jogar
-
-1. Execute `python main.py`
-2. Escolha o modo de jogo:
-   - **Dois Jogadores** — humano vs. humano
-   - **Contra a IA** — escolha a dificuldade (Fácil / Médio / Difícil) e sua cor (Vermelho ou Azul)
-3. Clique em uma de suas peças para selecioná-la
-4. Clique em uma casa destacada para mover:
-   - Verde = movimento simples
-   - Laranja = captura
-5. Capturas são obrigatórias quando disponíveis
-6. Use o botão **Desfazer** para reverter a última jogada (modo IA)
-7. Use o botão **Empate** para encerrar a partida sem vencedor
-8. Use o botão **Menu** para voltar ao menu inicial sem fechar o app
-
-**Cores:** Vermelho = Jogador 1 | Azul = Jogador 2 / IA | Coroa = dama promovida
-
----
-
-## IA — Níveis de Dificuldade
-
-| Nível | Estratégia | Tempo médio por jogada |
-|---|---|---|
-| Fácil | Movimentos aleatórios | < 1 ms |
-| Médio | Minimax com poda alfa-beta (profundidade 3) | ~50–200 ms |
-| Difícil | Minimax com poda alfa-beta (profundidade 5) | ~0.1–3 s |
-
-A função de avaliação considera material (peça comum = 1 ponto, dama = 3) e posição: bônus de centralização e bônus de proteção para peças na linha de fundo. Movimentos de captura são explorados primeiro para melhorar a eficiência da poda.
-
----
-
-## Estrutura do Projeto
-
-```
-Damas/
-├── main.py                          # Ponto de entrada e menu inicial
-├── src/
-│   ├── config.py                    # Configurações globais (cores, tamanhos)
-│   ├── game.py                      # Orquestrador do jogo (Jogo)
-│   ├── models/                      # Estado puro: Tabuleiro, Peca, enums
-│   ├── services/                    # Regras: validação, capturas, promoção
-│   ├── ia/                          # IA: factory + estratégias minimax
-│   └── gui/                         # Interface tkinter: renderização e eventos
-├── tests/
-│   └── teste_jogo.py
-└── scripts/
-    └── executar_jogo.bat
-```
-
----
-
-## Exemplos de Uso Programático
-
-```python
-from src.game import Jogo
-
-jogo = Jogo()
-jogo.selecionar_peca(2, 1)
-print(jogo.movimentos_validos)
-jogo.mover_peca(2, 1, 3, 0)
-
-jogo.desfazer_jogada()
-
-fim, vencedor = jogo.verificar_fim_de_jogo()
-if fim:
-    print(f"Vencedor: {vencedor}")
-```
-
----
-
-## Solução de Problemas
-
-**`ModuleNotFoundError: No module named 'tkinter'`**
+Se aparecer `ModuleNotFoundError: No module named 'tkinter'`, instale o pacote para sua plataforma:
 
 ```bash
 # Ubuntu/Debian
@@ -149,16 +54,81 @@ sudo apt-get install python3-tk
 # Fedora
 sudo dnf install python3-tkinter
 
-# macOS
+# macOS (Homebrew)
 brew install python-tk
 ```
 
----
+No Windows, reinstale o Python marcando a opção **Tcl/Tk** no instalador oficial.
+
+## Testes
+
+A suíte usa `assert` direto — sem pytest nem unittest. Cobre inicialização, movimentos simples, capturas, capturas obrigatórias, sequências, promoção, dama, fim de jogo, histórico e desfazer.
+
+```bash
+python tests/teste_jogo.py
+```
+
+Para executar um teste isolado:
+
+```bash
+python -c "from tests.teste_jogo import teste_desfazer_captura; teste_desfazer_captura()"
+```
+
+## Como Jogar
+
+1. Execute `python main.py` e escolha o modo:
+   - **Dois Jogadores** — humano vs. humano na mesma máquina
+   - **Contra a IA** — escolha a dificuldade e sua cor
+2. Clique em uma peça do jogador atual para selecioná-la.
+3. Clique em uma casa destacada para mover ou capturar.
+4. **Captura é obrigatória** — se existir captura disponível, só ela será permitida.
+5. Se uma captura abrir nova captura pela mesma peça, o turno continua até encerrar a sequência.
+6. Use os botões da barra inferior: `Novo Jogo`, `Empate`, `Desfazer` (modo IA), `Histórico`, `Menu` e `Sair`.
+
+**Cores e posições iniciais:**
+
+| Jogador | Cor | Linhas iniciais | Promove em |
+|---|---|---|---|
+| Jogador 1 | Vermelho | 5–7 (move para cima) | Linha 0 |
+| Jogador 2 / IA | Azul | 0–2 (move para baixo) | Linha 7 |
+
+## IA
+
+| Dificuldade | Estratégia |
+|---|---|
+| Fácil | Movimento aleatório |
+| Médio | Minimax com poda alfa-beta, profundidade 3 |
+| Difícil | Minimax com poda alfa-beta, profundidade 5 |
+
+A IA pode jogar com qualquer cor — no menu, escolha a cor do humano e a IA assumirá a oposta.
+
+## Estrutura do Projeto
+
+```text
+Damas/
+├── main.py                  # Janela única, menu, opções de IA e agendamento da IA
+├── src/
+│   ├── config.py            # Constantes visuais e temas
+│   ├── game.py              # Orquestrador de estado e regras públicas
+│   ├── models/              # Peca, Tabuleiro e enums
+│   ├── services/            # Validação, captura e promoção
+│   ├── ia/                  # Factory de IA e estratégias
+│   └── gui/                 # Renderização e eventos tkinter
+├── tests/
+│   └── teste_jogo.py        # Testes procedurais
+├── scripts/
+│   └── executar_jogo.bat
+└── docs/                    # Documentação técnica
+```
+
+## Documentação
+
+- [Índice](docs/README.md)
+- [Arquitetura](docs/arquitetura/visao-geral.md)
+- [Referência técnica](docs/referencia/README.md)
+- [Guias práticos](docs/guias/README.md)
+- [Auditorias](docs/auditorias/README.md)
 
 ## Licença
 
 Este projeto está sob a licença [MIT](./LICENSE).
-
----
-
-Desenvolvido por [Allan Giaretta](https://github.com/AllanGiaretta26).
