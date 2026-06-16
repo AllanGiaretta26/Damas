@@ -15,10 +15,6 @@ Aplicação desktop de damas construída em Python puro com tkinter. O projeto i
 
 O código é organizado em camadas (modelos, serviços, IA, GUI) e acompanha uma suíte de testes procedurais que cobre os principais cenários do jogo.
 
-## Screenshot
-
-![Screenshot do jogo](./assets/screenshot.png)
-
 ## Tecnologias
 
 - **Python 3.7+**
@@ -132,3 +128,6 @@ Damas/
 ## Licença
 
 Este projeto está sob a licença [MIT](./LICENSE).
+
+---
+Desenvolvido por [Allan Giaretta](https://github.com/allangiaretta26).
